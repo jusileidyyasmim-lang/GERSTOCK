@@ -1,0 +1,3625 @@
+<!DOCTYPE html>
+<html lang="pt-PT" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GereStock — Gestão de Stocks, Produtos e Vendas</title>
+  <meta name="description" content="GereStock — painel de gestão de stocks, produtos e vendas para lojas de informática.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <style>
+/* ============================================================
+   GereStock — style.css
+   Painel de gestão de stocks, produtos e vendas
+   ============================================================ */
+
+/* ---------- 1. Variáveis de tema ---------- */
+:root {
+  --brand: #2563eb;
+  --brand-dark: #1d4ed8;
+  --brand-light: #dbeafe;
+  --brand-soft: #eff6ff;
+
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --border: #e2e8f0;
+
+  --text: #0f172a;
+  --text-soft: #64748b;
+  --text-invert: #f8fafc;
+
+  --sidebar-bg: #0f1e35;
+  --sidebar-bg-2: #16294a;
+  --sidebar-text: #c7d5ea;
+  --sidebar-active: #2563eb;
+
+  --green: #16a34a;
+  --green-soft: #dcfce7;
+  --amber: #d97706;
+  --amber-soft: #fef3c7;
+  --red: #dc2626;
+  --red-soft: #fee2e2;
+  --violet: #7c3aed;
+  --cyan: #0891b2;
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .06);
+  --shadow: 0 4px 12px rgba(15, 23, 42, .07);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, .12);
+
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 20px;
+
+  --sidebar-w: 256px;
+  --topbar-h: 76px;
+  --ease: cubic-bezier(.4, 0, .2, 1);
+}
+
+html[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #131f36;
+  --surface-2: #182a45;
+  --border: #21324f;
+
+  --text: #e8eefb;
+  --text-soft: #93a5c0;
+
+  --sidebar-bg: #080f1c;
+  --sidebar-bg-2: #0f1e35;
+  --sidebar-text: #a9bcd8;
+
+  --brand-light: #1e3a6b;
+  --brand-soft: #16264a;
+
+  --green-soft: #10382a;
+  --amber-soft: #3d2c0a;
+  --red-soft: #3f1a1d;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow: 0 4px 14px rgba(0, 0, 0, .45);
+  --shadow-lg: 0 14px 36px rgba(0, 0, 0, .55);
+}
+
+/* ---------- 2. Reset ---------- */
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  transition: background .3s var(--ease), color .3s var(--ease);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -.01em; }
+p { margin: 0 0 .8rem; }
+p:last-child { margin-bottom: 0; }
+a { color: var(--brand); text-decoration: none; }
+ul { margin: 0; padding: 0; list-style: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+canvas { max-width: 100%; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #b7c3d6; border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+html[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #2c3f5e; background-clip: content-box; }
+
+/* ---------- 3. Sidebar ---------- */
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, var(--sidebar-bg) 0%, var(--sidebar-bg-2) 100%);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  z-index: 60;
+  transition: transform .3s var(--ease);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: 1.35rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.brand-logo {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--brand) 0%, #4f8bff 100%);
+  color: #fff;
+  font-size: 1.15rem;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, .45);
+}
+
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand-text strong { color: #fff; font-size: 1.12rem; letter-spacing: -.02em; }
+.brand-text small { color: #7f95b5; font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; }
+
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 1rem .75rem; }
+
+.nav-group-label {
+  margin: 1rem .75rem .45rem;
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: #667ea0;
+}
+.nav-group-label:first-child { margin-top: .2rem; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  padding: .7rem .85rem;
+  margin-bottom: .2rem;
+  border-radius: var(--radius-sm);
+  color: var(--sidebar-text);
+  font-size: .92rem;
+  font-weight: 500;
+  transition: background .2s var(--ease), color .2s var(--ease), transform .2s var(--ease);
+}
+.nav-item i { width: 20px; text-align: center; font-size: .98rem; }
+.nav-item:hover { background: rgba(255, 255, 255, .07); color: #fff; transform: translateX(3px); }
+.nav-item.active {
+  background: linear-gradient(90deg, var(--brand) 0%, rgba(37, 99, 235, .35) 100%);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, .32);
+}
+
+.sidebar-footer { padding: 1rem 1.15rem 1.25rem; border-top: 1px solid rgba(255, 255, 255, .08); }
+
+.stock-health-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .78rem;
+  margin-bottom: .5rem;
+}
+.stock-health-head span { color: #93a9c9; }
+.stock-health-head strong { color: #fff; }
+.stock-health-head i { color: #fbbf24; margin-right: .25rem; }
+
+.progress-track { height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .12); overflow: hidden; }
+.progress-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #22c55e, #fbbf24, #ef4444);
+  transition: width .6s var(--ease);
+}
+.version { margin: .75rem 0 0; font-size: .7rem; color: #5c739a; }
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 15, 28, .55);
+  backdrop-filter: blur(2px);
+  z-index: 55;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s var(--ease), visibility .3s var(--ease);
+}
+.sidebar-overlay.show { opacity: 1; visibility: visible; }
+
+/* ---------- 4. Topbar ---------- */
+.main-wrapper {
+  margin-left: var(--sidebar-w);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin .3s var(--ease);
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: var(--topbar-h);
+  padding: .9rem 1.75rem;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-left { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+.page-title { font-size: 1.32rem; }
+.page-subtitle { margin: 0; font-size: .82rem; color: var(--text-soft); }
+
+.topbar-right { display: flex; align-items: center; gap: .85rem; }
+
+.topbar-date {
+  font-size: .82rem;
+  color: var(--text-soft);
+  padding: .4rem .8rem;
+  border-radius: 99px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: background .2s var(--ease), color .2s var(--ease), transform .2s var(--ease), border-color .2s var(--ease);
+}
+.icon-btn:hover { background: var(--brand); color: #fff; border-color: var(--brand); transform: translateY(-2px); }
+.menu-btn { display: none; }
+
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .3rem .85rem .3rem .35rem;
+  border-radius: 99px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text);
+  text-align: left;
+}
+.user-box:hover { border-color: var(--brand); box-shadow: var(--shadow-sm); }
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand), #4f8bff);
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 700;
+}
+.user-meta { display: flex; flex-direction: column; line-height: 1.15; }
+.user-meta strong { font-size: .84rem; }
+.user-meta small { font-size: .7rem; color: var(--text-soft); }
+
+/* ---------- 5. Content / pages ---------- */
+#content { flex: 1; padding: 1.75rem; max-width: 1600px; width: 100%; }
+
+.page { display: none; animation: fadeUp .45s var(--ease); }
+.page.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+.site-footer {
+  padding: 1.25rem 1.75rem 2rem;
+  font-size: .78rem;
+  color: var(--text-soft);
+  text-align: center;
+}
+
+/* ---------- 5.1 Página inicial e definições ---------- */
+.welcome-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+  padding: 2rem; margin-bottom: 1.35rem; border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #0f1e35 0%, #1d4ed8 100%); color: #fff; box-shadow: var(--shadow-lg);
+}
+.welcome-card h2 { margin: .45rem 0 .5rem; font-size: clamp(1.35rem, 2.8vw, 2rem); }
+.welcome-card p { max-width: 60ch; color: #d5e2ff; }
+.welcome-actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1.15rem; }
+.welcome-actions .btn-ghost { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.28); }
+.quick-actions { display: grid; gap: .65rem; }
+.quick-action { display: grid; grid-template-columns: 36px 1fr; column-gap: .7rem; text-align: left; padding: .8rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; }
+.quick-action:hover { border-color: var(--brand); background: var(--brand-soft); }
+.quick-action i { grid-row: span 2; align-self: center; color: var(--brand); font-size: 1.1rem; text-align: center; }
+.quick-action span { font-weight: 700; font-size: .88rem; }
+.quick-action small { color: var(--text-soft); }
+.compact-summary { margin-bottom: 1rem; }
+.settings-info { display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; }
+.settings-note { display: flex; gap: .65rem; padding: .9rem; border-radius: var(--radius-sm); background: var(--brand-soft); color: var(--brand-dark); font-size: .84rem; }
+.settings-note i { margin-top: .15rem; }
+
+/* ---------- 6. Cartões ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.35rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .25s var(--ease), transform .25s var(--ease), border-color .25s var(--ease);
+  margin-bottom: 1.35rem;
+}
+.card:hover { box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--brand) 30%, var(--border)); }
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-bottom: 1.1rem;
+}
+.card-head h2 { font-size: 1rem; display: flex; align-items: center; gap: .55rem; }
+.card-head h2 i { color: var(--brand); }
+.card-head-wrap { flex-wrap: wrap; }
+
+.link-btn {
+  font-size: .82rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  transition: gap .2s var(--ease);
+}
+.link-btn:hover { gap: .6rem; }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.35rem; }
+.grid-2 > .card, .grid-pos > .card, .grid-pos > .summary-card { margin-bottom: 0; }
+.grid-2 { margin-bottom: 1.35rem; }
+.grid-pos { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 1.35rem; }
+
+/* ---------- 7. Cartões de estatística ---------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 1.1rem;
+  margin-bottom: 1.35rem;
+}
+.stat-grid-3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.stat-grid-4 { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom: 0; }
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.15rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--accent, var(--brand));
+}
+.stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+.stat-top { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.stat-label { font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-soft); }
+.stat-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--accent, var(--brand)) 14%, transparent);
+  color: var(--accent, var(--brand));
+  font-size: .98rem;
+}
+.stat-value { margin-top: .55rem; font-size: 1.65rem; font-weight: 800; letter-spacing: -.02em; }
+.stat-foot { font-size: .76rem; color: var(--text-soft); }
+
+/* ---------- 8. Tabelas ---------- */
+.table-scroll { overflow-x: auto; border-radius: var(--radius); }
+.table-info { font-size: .8rem; color: var(--text-soft); margin: 0 0 .75rem; }
+
+.data-table { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 560px; }
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  text-align: left;
+  font-size: .74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-soft);
+  padding: .75rem .85rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.data-table tbody td { padding: .72rem .85rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.data-table tbody tr { transition: background .18s var(--ease); }
+.data-table tbody tr:hover { background: color-mix(in srgb, var(--brand) 5%, transparent); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.data-table .col-actions { text-align: right; }
+.data-table .mono { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .82rem; color: var(--text-soft); }
+.data-table strong { font-weight: 600; }
+
+.row-actions { display: flex; gap: .35rem; justify-content: flex-end; }
+.mini-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: .78rem;
+  transition: background .2s var(--ease), color .2s var(--ease), transform .2s var(--ease), border-color .2s var(--ease);
+}
+.mini-btn:hover { transform: translateY(-2px); color: #fff; }
+.mini-btn.edit:hover { background: var(--brand); border-color: var(--brand); }
+.mini-btn.restock:hover { background: var(--green); border-color: var(--green); }
+.mini-btn.delete:hover { background: var(--red); border-color: var(--red); }
+
+/* ---------- 9. Badges / pills ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .22rem .6rem;
+  border-radius: 99px;
+  font-size: .74rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge.ok { background: var(--green-soft); color: var(--green); }
+.badge.warn { background: var(--amber-soft); color: var(--amber); }
+.badge.crit { background: var(--red-soft); color: var(--red); }
+
+.pill {
+  padding: .22rem .7rem;
+  border-radius: 99px;
+  font-size: .76rem;
+  font-weight: 700;
+}
+.pill-warn { background: var(--amber-soft); color: var(--amber); }
+
+/* ---------- 10. Toolbar / formulários ---------- */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.field-icon { position: relative; flex: 1 1 240px; min-width: 200px; }
+.field-icon i {
+  position: absolute;
+  left: .85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-soft);
+  font-size: .85rem;
+  pointer-events: none;
+}
+.field-icon input { padding-left: 2.3rem; }
+
+input, select, textarea {
+  width: 100%;
+  padding: .62rem .8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+select { cursor: pointer; }
+.toolbar select { flex: 0 1 180px; min-width: 150px; }
+
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: .35rem; font-size: .82rem; font-weight: 600; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; }
+.hint { margin: .4rem 0 0; font-size: .76rem; color: var(--text-soft); }
+.muted { color: var(--text-soft); font-size: .84rem; }
+
+/* ---------- 11. Botões ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .65rem 1.15rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .22s var(--ease), color .22s var(--ease), transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--brand); color: #fff; box-shadow: 0 4px 12px rgba(37, 99, 235, .28); }
+.btn-primary:hover { background: var(--brand-dark); box-shadow: 0 8px 20px rgba(37, 99, 235, .38); }
+.btn-success { background: var(--green); color: #fff; box-shadow: 0 4px 12px rgba(22, 163, 74, .28); }
+.btn-success:hover { background: #15803d; box-shadow: 0 8px 20px rgba(22, 163, 74, .38); }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-ghost { background: var(--surface); border-color: var(--border); color: var(--text); }
+.btn-ghost:hover { background: var(--brand-soft); border-color: var(--brand); color: var(--brand-dark); }
+html[data-theme="dark"] .btn-ghost:hover { color: #cfe0ff; }
+.btn-block { width: 100%; }
+
+/* ---------- 12. POS / venda ---------- */
+.stock-preview { display: flex; flex-wrap: wrap; gap: .5rem; margin: -.35rem 0 1rem; }
+.stock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .35rem .75rem;
+  border-radius: 99px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: .8rem;
+  font-weight: 600;
+}
+.stock-chip i { color: var(--brand); }
+.stock-chip.low { background: var(--red-soft); color: var(--red); border-color: transparent; }
+.stock-chip.low i { color: var(--red); }
+
+.qty-control { display: flex; align-items: center; gap: .5rem; max-width: 220px; }
+.qty-btn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  transition: background .2s var(--ease), color .2s var(--ease), transform .2s var(--ease);
+}
+.qty-btn:hover { background: var(--brand); color: #fff; border-color: var(--brand); }
+.qty-control input { text-align: center; font-weight: 700; }
+
+.sale-lines {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: .6rem;
+  padding: .9rem;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px dashed var(--border);
+  margin-bottom: 1rem;
+}
+.sale-lines .line { display: flex; flex-direction: column; }
+.sale-lines .line span { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text-soft); }
+.sale-lines .line strong { font-size: 1.02rem; font-variant-numeric: tabular-nums; }
+
+.pos-actions { display: flex; flex-direction: column; gap: .6rem; }
+
+.summary-card { position: sticky; top: calc(var(--topbar-h) + 1.35rem); height: fit-content; }
+.summary-list { margin: 0 0 1rem; }
+.summary-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .55rem 0;
+  border-bottom: 1px dashed var(--border);
+}
+.summary-list dt { font-size: .84rem; color: var(--text-soft); }
+.summary-list dd { margin: 0; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.summary-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .9rem 1rem;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--brand) 0%, #4f8bff 100%);
+  color: #fff;
+}
+.summary-total strong { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+
+/* ---------- 13. Alertas / listas ---------- */
+.alert {
+  padding: .7rem .9rem;
+  border-radius: var(--radius-sm);
+  font-size: .84rem;
+  font-weight: 500;
+  margin: 0 0 1rem;
+}
+.alert.error { background: var(--red-soft); color: var(--red); }
+.alert.success { background: var(--green-soft); color: var(--green); }
+.alert.info { background: var(--brand-soft); color: var(--brand-dark); }
+
+.low-stock-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .7rem .8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-bottom: .5rem;
+  transition: background .2s var(--ease), transform .2s var(--ease);
+}
+.low-stock-list li:hover { background: var(--surface-2); transform: translateX(3px); }
+.low-stock-list .ls-name { font-weight: 600; font-size: .88rem; display: block; }
+.low-stock-list .ls-ref { font-size: .74rem; color: var(--text-soft); }
+.low-stock-list .ls-qty { font-weight: 700; font-size: .95rem; }
+
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--text-soft);
+}
+.empty-state i { font-size: 2.4rem; color: var(--border); margin-bottom: .6rem; display: block; }
+.empty-inline { padding: 1.6rem .5rem; text-align: center; color: var(--text-soft); font-size: .86rem; }
+
+/* ---------- 14. Gráficos ---------- */
+.chart-holder { position: relative; width: 100%; height: 280px; }
+.chart-holder.chart-tall { height: 330px; }
+.chart-holder svg { width: 100%; height: 100%; overflow: visible; }
+.chart-holder .chart-bar { transition: opacity .2s var(--ease); cursor: pointer; }
+.chart-holder .chart-bar:hover { opacity: 1; filter: brightness(1.08); }
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem 1rem;
+  margin-top: .75rem;
+  font-size: .76rem;
+  color: var(--text-soft);
+}
+.chart-legend span { display: inline-flex; align-items: center; gap: .35rem; }
+.chart-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.chart-empty { display: grid; place-items: center; height: 100%; color: var(--text-soft); font-size: .86rem; }
+
+/* ---------- 15. Paginação ---------- */
+.pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem; margin-top: 1.1rem; }
+.pagination button {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 .6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: .84rem;
+  font-weight: 600;
+  transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
+}
+.pagination button:hover:not(:disabled) { background: var(--brand-soft); border-color: var(--brand); color: var(--brand-dark); }
+.pagination button.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+.pagination button:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ---------- 16. Empresa ---------- */
+.hero-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #0f1e35 0%, #1d4ed8 100%);
+  color: #fff;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 1.35rem;
+  overflow: hidden;
+}
+.hero-card h2 { font-size: clamp(1.2rem, 2.4vw, 1.75rem); margin: .45rem 0 .5rem; }
+.hero-card p { color: #d5e2ff; max-width: 60ch; margin: 0; }
+.hero-tag {
+  display: inline-block;
+  padding: .22rem .7rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, .16);
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.hero-illustration {
+  display: grid;
+  place-items: center;
+  width: 110px;
+  height: 110px;
+  flex: 0 0 110px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, .12);
+  font-size: 2.8rem;
+  animation: floaty 4.5s ease-in-out infinite;
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+
+.feature-list li { display: flex; align-items: flex-start; gap: .55rem; padding: .3rem 0; font-size: .88rem; }
+.feature-list i { color: var(--green); margin-top: .25rem; }
+
+address { font-style: normal; line-height: 1.7; }
+
+.map-illustration {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  margin-top: .9rem;
+  padding: .9rem 1rem;
+  border-radius: var(--radius);
+  background: linear-gradient(120deg, var(--brand-soft), transparent);
+  border: 1px dashed var(--brand);
+  color: var(--brand-dark);
+  font-size: .86rem;
+  font-weight: 600;
+}
+html[data-theme="dark"] .map-illustration { color: #cfe0ff; }
+.map-illustration i { font-size: 1.3rem; color: var(--brand); }
+
+.hours-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .8rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: .9rem;
+}
+.hours-list strong { color: var(--brand); }
+
+.tag-cloud { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .9rem; }
+.tag {
+  padding: .3rem .75rem;
+  border-radius: 99px;
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  font-size: .78rem;
+  font-weight: 600;
+  transition: transform .2s var(--ease);
+}
+html[data-theme="dark"] .tag { color: #cfe0ff; }
+.tag:hover { transform: translateY(-2px); }
+
+/* ---------- 17. FAQ (acordeões) ---------- */
+.faq { display: flex; flex-direction: column; gap: .6rem; }
+
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  overflow: hidden;
+  transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.faq-item.open { border-color: var(--brand); box-shadow: var(--shadow); }
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem 1.15rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: .95rem;
+  font-weight: 600;
+  transition: background .2s var(--ease), color .2s var(--ease);
+}
+.faq-question:hover { background: var(--brand-soft); color: var(--brand-dark); }
+html[data-theme="dark"] .faq-question:hover { color: #cfe0ff; }
+.faq-question i {
+  flex: 0 0 auto;
+  color: var(--brand);
+  transition: transform .3s var(--ease);
+}
+.faq-item.open .faq-question i { transform: rotate(180deg); }
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .38s var(--ease), padding .3s var(--ease), opacity .3s var(--ease);
+  opacity: 0;
+  padding: 0 1.15rem;
+}
+.faq-item.open .faq-answer { opacity: 1; padding: .2rem 1.15rem 1.1rem; }
+.faq-answer p { color: var(--text-soft); font-size: .89rem; margin: 0; }
+
+/* ---------- 18. Modais ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(8, 15, 28, .55);
+  backdrop-filter: blur(3px);
+  animation: fadeIn .25s var(--ease);
+}
+.modal-overlay[hidden] { display: none; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  width: 100%;
+  max-width: 620px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: modalIn .3s var(--ease);
+}
+.modal-sm { max-width: 440px; }
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(18px) scale(.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.35rem;
+  border-bottom: 1px solid var(--border);
+}
+.modal-head h2 { font-size: 1.06rem; }
+.modal-body { padding: 1.35rem; }
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: .6rem;
+  margin-top: .5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ---------- 19. Toasts ---------- */
+.toast-container {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  max-width: min(360px, calc(100vw - 2.5rem));
+}
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: .7rem;
+  padding: .8rem 1rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--brand);
+  box-shadow: var(--shadow-lg);
+  font-size: .86rem;
+  animation: toastIn .35s var(--ease);
+}
+.toast.hide { animation: toastOut .3s var(--ease) forwards; }
+.toast i { margin-top: .15rem; }
+.toast.success { border-left-color: var(--green); }
+.toast.success i { color: var(--green); }
+.toast.error { border-left-color: var(--red); }
+.toast.error i { color: var(--red); }
+.toast.info i { color: var(--brand); }
+.toast strong { display: block; font-size: .87rem; }
+.toast span { color: var(--text-soft); font-size: .8rem; }
+
+@keyframes toastIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+@keyframes toastOut { to { opacity: 0; transform: translateX(24px); } }
+
+/* ---------- 20. Responsivo ---------- */
+@media (max-width: 1180px) {
+  .grid-pos { grid-template-columns: 1fr; }
+  .summary-card { position: static; }
+}
+
+@media (max-width: 1024px) {
+  .sidebar { transform: translateX(-100%); box-shadow: var(--shadow-lg); }
+  .sidebar.open { transform: none; }
+  .main-wrapper { margin-left: 0; }
+  .menu-btn { display: grid; }
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  #content { padding: 1.1rem; }
+  .topbar { padding: .75rem 1.1rem; min-height: 68px; }
+  .page-title { font-size: 1.1rem; }
+  .page-subtitle { display: none; }
+  .topbar-date { display: none; }
+  .user-meta { display: none; }
+  .user-box { padding: .25rem; }
+  .card { padding: 1.1rem; border-radius: var(--radius); }
+  .form-grid { grid-template-columns: 1fr; }
+  .hero-card { flex-direction: column; align-items: flex-start; padding: 1.5rem; }
+  .welcome-card { flex-direction: column; align-items: flex-start; padding: 1.5rem; }
+  .hero-illustration { width: 76px; height: 76px; flex-basis: 76px; font-size: 2rem; }
+  .toolbar select { flex: 1 1 100%; }
+  .toolbar .btn { flex: 1 1 100%; }
+  .stat-value { font-size: 1.45rem; }
+  .chart-holder { height: 230px; }
+  .chart-holder.chart-tall { height: 260px; }
+  .toast-container { left: 1.1rem; right: 1.1rem; bottom: 1.1rem; max-width: none; }
+}
+
+@media print {
+  .sidebar, .topbar, .site-footer, .toast-container { display: none !important; }
+  .main-wrapper { margin: 0; }
+  .page { display: block !important; }
+}
+
+
+/* ---------- Início de sessão ---------- */
+.login-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at top right,#193c6d 0,#0b1424 48%,#050a12 100%);overflow:auto}
+.login-card{width:min(100%,430px);padding:30px 32px;background:#fff;border:1px solid rgba(255,255,255,.3);border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:10px;color:#0f172a}
+.login-logo{display:block;width:100%;max-width:300px;height:auto;max-height:150px;object-fit:contain;align-self:center;border-radius:10px;background:#050a12}
+.login-subtitle{text-align:center;margin:0 0 8px;color:#64748b;font-size:13px;letter-spacing:.4px}
+.login-card h1{font-size:25px;margin:8px 0 0;text-align:center;color:#10284b}
+.login-help{text-align:center;color:#64748b;font-size:13px;margin:0 0 10px}
+.login-card label{font-size:13px;font-weight:600;margin-top:5px}
+.login-card input{width:100%;padding:12px 13px;border:1px solid #94a3b8;border-radius:10px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:500;color:#111827;background:#fff;outline:none;box-sizing:border-box}
+.login-card input::placeholder{color:#64748b;opacity:1;font-weight:400}
+.login-card label{font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#1e293b}
+.login-switch{display:block;width:100%;margin-top:2px;padding:10px;border:1px solid #bfdbfe;border-radius:10px;background:#eff6ff;color:#075985;font-weight:700;font-size:14px;cursor:pointer}
+.login-switch:hover{background:#dbeafe}
+.login-register-fields[hidden]{display:none}
+.login-status{font-size:13px;min-height:16px;margin:0;color:#166534}
+.login-status.error{color:#b91c1c}
+.login-card input:focus{border-color:#1689ef;box-shadow:0 0 0 3px rgba(22,137,239,.14)}
+.login-submit{margin-top:8px;padding:13px;border:0;border-radius:10px;background:linear-gradient(100deg,#0878e8,#17b5ef);color:white;font-weight:700;font-size:15px;cursor:pointer}
+.login-submit:hover{filter:brightness(1.06)}
+.login-error{min-height:0;margin:0;color:#b91c1c;font-size:13px}
+.login-note{text-align:center;color:#64748b;font-size:11px;margin-top:5px}
+@media(max-width:480px){.login-card{padding:24px 20px}.login-logo{max-width:250px}}
+
+</style>
+</head>
+<body>
+
+  <div id="login-screen" class="login-screen">
+    <form id="login-form" class="login-card">
+      <img src="logo-gerestock.png" alt="Logótipo GereStock" class="login-logo">
+      <p class="login-subtitle">Sistema de Gestão de Stocks</p>
+      <h1>Iniciar sessão</h1>
+      <p class="login-help">Introduza os seus dados para aceder ao sistema.</p>
+      <label for="login-user">Utilizador</label>
+      <input id="login-user" name="username" autocomplete="username" required placeholder="Utilizador">
+      <label for="login-password">Palavra-passe</label>
+      <input id="login-password" name="password" type="password" autocomplete="current-password" required placeholder="Palavra-passe">
+      <p id="login-error" class="login-error" role="alert"></p>
+      <div id="login-register-fields" class="login-register-fields" hidden>
+        <label for="register-confirm">Confirmar palavra-passe</label>
+        <input id="register-confirm" type="password" autocomplete="new-password" placeholder="Repete a palavra-passe">
+      </div>
+      <button type="submit" id="login-submit" class="login-submit">Entrar no GereStock</button>
+      <button type="button" id="login-toggle-register" class="login-switch">Ainda não tens conta? Criar registo</button>
+      <p id="login-status" class="login-status" role="status"></p>
+      <small class="login-note">Conta de demonstração: admin / GereStock123!</small>
+    </form>
+  </div>
+
+
+  <!-- ============ BARRA LATERAL ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-logo"><i class="fa-solid fa-boxes-stacked"></i></span>
+      <span class="brand-text">
+        <strong>GereStock</strong>
+        <small>Gestão de Stocks</small>
+      </span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Navegação principal">
+      <p class="nav-group-label">Principal</p>
+      <a href="#inicio" class="nav-item active" data-page="inicio"><i class="fa-solid fa-house"></i><span>Página Inicial</span></a>
+      <a href="#dashboard" class="nav-item" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></a>
+      <p class="nav-group-label">Gestão</p>
+      <a href="#inventario" class="nav-item" data-page="inventario"><i class="fa-solid fa-boxes-packing"></i><span>Inventário</span></a>
+      <a href="#venda" class="nav-item" data-page="venda"><i class="fa-solid fa-cash-register"></i><span>Registar Venda</span></a>
+      <a href="#historico" class="nav-item" data-page="historico"><i class="fa-solid fa-clock-rotate-left"></i><span>Histórico de Vendas</span></a>
+      <a href="#clientes" class="nav-item" data-page="clientes"><i class="fa-solid fa-users"></i><span>Clientes</span></a>
+      <a href="#fornecedores" class="nav-item" data-page="fornecedores"><i class="fa-solid fa-truck-field"></i><span>Fornecedores</span></a>
+      <a href="#movimentos" class="nav-item" data-page="movimentos"><i class="fa-solid fa-arrow-right-arrow-left"></i><span>Movimentos de Stock</span></a>
+
+      <p class="nav-group-label">Análise</p>
+      <a href="#relatorios" class="nav-item" data-page="relatorios"><i class="fa-solid fa-chart-line"></i><span>Relatórios</span></a>
+
+      <p class="nav-group-label">Institucional</p>
+      <a href="#empresa" class="nav-item" data-page="empresa"><i class="fa-solid fa-building"></i><span>Empresa</span></a>
+      <a href="#faq" class="nav-item" data-page="faq"><i class="fa-solid fa-circle-question"></i><span>FAQ</span></a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="stock-health">
+        <div class="stock-health-head">
+          <span><i class="fa-solid fa-triangle-exclamation"></i> Stock baixo</span>
+          <strong id="sidebar-low-stock">0</strong>
+        </div>
+        <div class="progress-track"><span class="progress-fill" id="sidebar-health-bar"></span></div>
+      </div>
+      <p class="version">GereStock v1.0 &middot; dados locais</p>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ============ CONTEÚDO PRINCIPAL ============ -->
+  <div class="main-wrapper">
+
+    <!-- Topbar -->
+    <header class="topbar" id="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn menu-btn" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div>
+          <h1 class="page-title" id="page-title">Dashboard</h1>
+          <p class="page-subtitle" id="page-subtitle">Resumo geral do negócio</p>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="topbar-date" id="today-date"></div>
+        <button class="icon-btn" id="theme-toggle" aria-label="Alternar tema claro/escuro" title="Alternar tema">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button class="user-box" id="admin-settings" type="button" aria-label="Abrir definições da loja" title="Definições da loja">
+          <span class="avatar" id="admin-avatar">AD</span>
+          <span class="user-meta">
+            <strong id="admin-name-display">Admin</strong>
+            <small id="admin-role-display">Gestor de loja</small>
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <main id="content">
+
+      <!-- ======================= PÁGINA INICIAL ======================= -->
+      <section class="page active" id="page-inicio" aria-labelledby="page-title">
+        <article class="welcome-card">
+          <div>
+            <span class="hero-tag">Gestão simplificada</span>
+            <h2>Bem-vindo, <span id="home-admin-name">Admin</span>.</h2>
+            <p>Controle o inventário, registe vendas e acompanhe o desempenho da sua loja num só lugar.</p>
+            <div class="welcome-actions">
+              <button class="btn btn-primary" type="button" data-page="venda"><i class="fa-solid fa-cash-register"></i> Registar venda</button>
+              <button class="btn btn-ghost" type="button" data-page="inventario"><i class="fa-solid fa-boxes-packing"></i> Ver inventário</button>
+            </div>
+          </div>
+          <div class="hero-illustration"><i class="fa-solid fa-boxes-stacked"></i></div>
+        </article>
+        <div class="stat-grid stat-grid-3" id="home-stats"></div>
+        <div class="grid-2">
+          <article class="card"><header class="card-head"><h2><i class="fa-solid fa-bolt"></i> Acesso rápido</h2></header><div class="quick-actions"><button class="quick-action" type="button" data-page="venda"><i class="fa-solid fa-cash-register"></i><span>Nova venda</span><small>Registar uma venda</small></button><button class="quick-action" type="button" data-page="inventario"><i class="fa-solid fa-plus"></i><span>Produtos</span><small>Gerir inventário</small></button><button class="quick-action" type="button" data-page="relatorios"><i class="fa-solid fa-chart-line"></i><span>Relatórios</span><small>Consultar indicadores</small></button></div></article>
+          <article class="card"><header class="card-head"><h2><i class="fa-solid fa-store"></i> Informação da loja</h2></header><dl class="summary-list compact-summary"><div><dt>Loja</dt><dd id="home-store-name">GereStock</dd></div><div><dt>Localização</dt><dd id="home-store-location">Arrábida Shopping</dd></div><div><dt>Pagamento predefinido</dt><dd id="home-payment-method">Cartão</dd></div></dl><button class="btn btn-ghost" type="button" data-page="definicoes"><i class="fa-solid fa-gear"></i> Abrir definições</button></article>
+        </div>
+      </section>
+
+      <!-- ======================= DASHBOARD ======================= -->
+      <section class="page" id="page-dashboard" aria-labelledby="page-title">
+        <div class="stat-grid" id="dashboard-stats"></div>
+
+        <div class="grid-2">
+          <article class="card">
+            <header class="card-head">
+              <h2><i class="fa-solid fa-chart-column"></i> Faturação dos últimos 7 dias</h2>
+            </header>
+            <div class="chart-holder" id="chart-fat"></div>
+          </article>
+          <article class="card">
+            <header class="card-head">
+              <h2><i class="fa-solid fa-chart-pie"></i> Distribuição do stock</h2>
+            </header>
+            <div class="chart-holder" id="chart-stock"></div>
+          </article>
+        </div>
+
+        <div class="grid-2">
+          <article class="card">
+            <header class="card-head">
+              <h2><i class="fa-solid fa-table-list"></i> Últimas vendas</h2>
+              <a href="#historico" class="link-btn" data-page="historico">Ver tudo <i class="fa-solid fa-arrow-right"></i></a>
+            </header>
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Produto</th><th class="num">Qtd.</th>
+                    <th class="num">Subtotal</th><th class="num">IVA</th><th class="num">Total</th><th>Data</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboard-sales-body"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="card">
+            <header class="card-head">
+              <h2><i class="fa-solid fa-triangle-exclamation"></i> Produtos com stock baixo</h2>
+              <span class="pill pill-warn" id="low-stock-count">0</span>
+            </header>
+            <ul class="low-stock-list" id="dashboard-low-stock"></ul>
+          </article>
+        </div>
+
+        <article class="card">
+          <header class="card-head">
+            <h2><i class="fa-solid fa-cubes"></i> Nível de stock por produto</h2>
+          </header>
+          <div class="chart-holder chart-tall" id="chart-products"></div>
+        </article>
+      </section>
+
+      <!-- ======================= INVENTÁRIO ======================= -->
+      <section class="page" id="page-inventario" aria-labelledby="page-title">
+        <article class="card">
+          <header class="card-head card-head-wrap">
+            <h2><i class="fa-solid fa-boxes-packing"></i> Inventário de produtos</h2>
+            <button class="btn btn-primary" id="btn-add-product"><i class="fa-solid fa-plus"></i> Adicionar Produto</button>
+          </header>
+
+          <div class="toolbar">
+            <div class="field-icon">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="search" id="inv-search" placeholder="Pesquisar por referência ou nome…" aria-label="Pesquisar produtos">
+            </div>
+            <select id="inv-filter-stock" aria-label="Filtrar por stock">
+              <option value="all">Stock: todos</option>
+              <option value="low">Stock baixo (≤ 3)</option>
+              <option value="medium">Stock reduzido (4–20)</option>
+              <option value="ok">Stock normal (&gt; 20)</option>
+            </select>
+            <select id="inv-filter-price" aria-label="Filtrar por preço">
+              <option value="all">Preço: todos</option>
+              <option value="p1">Até 25 €</option>
+              <option value="p2">25 € — 100 €</option>
+              <option value="p3">100 € — 500 €</option>
+              <option value="p4">Mais de 500 €</option>
+            </select>
+            <select id="inv-sort" aria-label="Ordenar produtos">
+              <option value="name-asc">Nome (A–Z)</option>
+              <option value="name-desc">Nome (Z–A)</option>
+              <option value="price-asc">Preço (crescente)</option>
+              <option value="price-desc">Preço (decrescente)</option>
+              <option value="stock-asc">Stock (crescente)</option>
+              <option value="stock-desc">Stock (decrescente)</option>
+            </select>
+            <button class="btn btn-ghost" id="inv-reset"><i class="fa-solid fa-rotate-left"></i> Limpar</button>
+          </div>
+
+          <p class="table-info" id="inv-info"></p>
+
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Referência</th><th>Nome</th><th class="num">Preço</th>
+                  <th class="num">Stock</th><th>Estado</th><th class="col-actions">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-body"></tbody>
+            </table>
+          </div>
+
+          <div class="empty-state" id="inv-empty" hidden>
+            <i class="fa-solid fa-box-open"></i>
+            <p>Nenhum produto corresponde aos filtros selecionados.</p>
+          </div>
+        </article>
+      </section>
+
+      <!-- ======================= REGISTAR VENDA ======================= -->
+      <section class="page" id="page-venda" aria-labelledby="page-title">
+        <div class="grid-pos">
+          <article class="card">
+            <header class="card-head">
+              <h2><i class="fa-solid fa-cash-register"></i> Ponto de venda</h2>
+            </header>
+
+            <form id="sale-form" novalidate>
+              <div class="form-group">
+                <label for="sale-product">Produto</label>
+                <select id="sale-product" required></select>
+                <p class="hint" id="sale-product-hint">Selecione um produto para ver o stock disponível.</p>
+              </div>
+
+              <div class="stock-preview">
+                <span class="stock-chip" id="sale-stock-chip"><i class="fa-solid fa-warehouse"></i> Stock: —</span>
+                <span class="stock-chip" id="sale-price-chip"><i class="fa-solid fa-tag"></i> Preço: —</span>
+              </div>
+
+              <div class="form-group">
+                <label for="sale-qty">Quantidade</label>
+                <div class="qty-control">
+                  <button type="button" class="qty-btn" id="qty-minus" aria-label="Diminuir quantidade"><i class="fa-solid fa-minus"></i></button>
+                  <input type="number" id="sale-qty" min="1" step="1" value="1" required>
+                  <button type="button" class="qty-btn" id="qty-plus" aria-label="Aumentar quantidade"><i class="fa-solid fa-plus"></i></button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="sale-payment">Método de pagamento</label>
+                <select id="sale-payment" required><option value="cash">Dinheiro</option><option value="card">Cartão</option><option value="mbway">MB WAY</option><option value="transfer">Transferência bancária</option></select>
+              </div>
+
+              <div class="form-group">
+                <label for="sale-client">Cliente</label>
+                <select id="sale-client"><option value="">Consumidor final</option></select>
+              </div>
+
+              <div class="form-group">
+                <label for="sale-discount">Desconto (€)</label>
+                <input type="number" id="sale-discount" min="0" step="0.01" value="0">
+              </div>
+
+              <div class="sale-lines" id="sale-lines"></div>
+
+              <p class="alert" id="sale-alert" hidden></p>
+
+              <div class="pos-actions">
+                <button type="submit" class="btn btn-success btn-block" id="btn-finalize">
+                  <i class="fa-solid fa-circle-check"></i> FINALIZAR VENDA
+                </button>
+                <button type="button" class="btn btn-ghost btn-block" id="btn-clear-sale"><i class="fa-solid fa-broom"></i> Limpar formulário</button>
+              </div>
+            </form>
+          </article>
+
+          <aside class="card summary-card">
+            <header class="card-head">
+              <h2><i class="fa-solid fa-receipt"></i> Resumo da venda</h2>
+            </header>
+            <dl class="summary-list">
+              <div><dt>Produto</dt><dd id="sum-product">—</dd></div>
+              <div><dt>Referência</dt><dd id="sum-ref">—</dd></div>
+              <div><dt>Quantidade</dt><dd id="sum-qty">0</dd></div>
+              <div><dt>Preço unitário</dt><dd id="sum-price">—</dd></div>
+              <div><dt>Pagamento</dt><dd id="sum-payment">—</dd></div><div><dt>Cliente</dt><dd id="sum-client">Consumidor final</dd></div><div><dt>Desconto</dt><dd id="sum-discount">0,00 €</dd></div>
+              <div><dt>Subtotal</dt><dd id="sum-subtotal">0,00 €</dd></div>
+              <div><dt>IVA (23%)</dt><dd id="sum-iva">0,00 €</dd></div>
+            </dl>
+            <div class="summary-total">
+              <span>Total</span>
+              <strong id="sum-total">0,00 €</strong>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ======================= CLIENTES ======================= -->
+      <section class="page" id="page-clientes" aria-labelledby="page-title">
+        <article class="card">
+          <header class="card-head card-head-wrap"><h2><i class="fa-solid fa-users"></i> Gestão de clientes</h2><button class="btn btn-primary" id="btn-add-client"><i class="fa-solid fa-plus"></i> Novo cliente</button></header>
+          <div class="toolbar"><div class="field-icon"><i class="fa-solid fa-magnifying-glass"></i><input type="search" id="client-search" placeholder="Pesquisar por nome, NIF ou telefone…"></div></div>
+          <div class="table-scroll"><table class="data-table"><thead><tr><th>Nome</th><th>NIF</th><th>Telefone</th><th>Email</th><th>Morada</th><th class="col-actions">Ações</th></tr></thead><tbody id="clients-body"></tbody></table></div>
+        </article>
+      </section>
+
+      <!-- ======================= FORNECEDORES ======================= -->
+      <section class="page" id="page-fornecedores" aria-labelledby="page-title">
+        <article class="card">
+          <header class="card-head card-head-wrap"><h2><i class="fa-solid fa-truck-field"></i> Gestão de fornecedores</h2><button class="btn btn-primary" id="btn-add-supplier"><i class="fa-solid fa-plus"></i> Novo fornecedor</button></header>
+          <div class="toolbar"><div class="field-icon"><i class="fa-solid fa-magnifying-glass"></i><input type="search" id="supplier-search" placeholder="Pesquisar fornecedor ou NIF…"></div></div>
+          <div class="table-scroll"><table class="data-table"><thead><tr><th>Empresa</th><th>NIF</th><th>Telefone</th><th>Email</th><th>Morada</th><th class="col-actions">Ações</th></tr></thead><tbody id="suppliers-body"></tbody></table></div>
+        </article>
+      </section>
+
+      <!-- ======================= MOVIMENTOS DE STOCK ======================= -->
+      <section class="page" id="page-movimentos" aria-labelledby="page-title">
+        <article class="card">
+          <header class="card-head"><h2><i class="fa-solid fa-arrow-right-arrow-left"></i> Movimentos de stock</h2></header>
+          <div class="table-scroll"><table class="data-table"><thead><tr><th>Data</th><th>Produto</th><th>Referência</th><th>Tipo</th><th class="num">Quantidade</th><th>Observação</th></tr></thead><tbody id="movements-body"></tbody></table></div>
+        </article>
+      </section>
+
+      <!-- ======================= HISTÓRICO ======================= -->
+      <section class="page" id="page-historico" aria-labelledby="page-title">
+        <div class="stat-grid stat-grid-3" id="history-stats"></div>
+
+        <article class="card">
+          <header class="card-head card-head-wrap">
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> Histórico de vendas</h2>
+            <button class="btn btn-ghost" id="btn-export-sales"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
+          </header>
+
+          <div class="toolbar">
+            <div class="field-icon">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="search" id="hist-search" placeholder="Pesquisar venda, produto ou referência…" aria-label="Pesquisar vendas">
+            </div>
+            <select id="hist-product" aria-label="Filtrar por produto"></select>
+            <input type="date" id="hist-date" aria-label="Filtrar por data">
+            <select id="hist-sort" aria-label="Ordenar vendas">
+              <option value="recent">Data (recente primeiro)</option>
+              <option value="old">Data (antiga primeiro)</option>
+              <option value="total-desc">Total (maior primeiro)</option>
+              <option value="total-asc">Total (menor primeiro)</option>
+            </select>
+            <button class="btn btn-ghost" id="hist-reset"><i class="fa-solid fa-rotate-left"></i> Limpar</button>
+          </div>
+
+          <p class="table-info" id="hist-info"></p>
+
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Produto</th><th>Referência</th><th class="num">Qtd.</th>
+                  <th class="num">Subtotal</th><th class="num">IVA</th><th class="num">Total</th>
+                  <th>Pagamento</th><th>Data</th><th class="col-actions">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="history-body"></tbody>
+            </table>
+          </div>
+
+          <nav class="pagination" id="hist-pagination" aria-label="Paginação do histórico"></nav>
+        </article>
+      </section>
+
+      <!-- ======================= DEFINIÇÕES ======================= -->
+      <section class="page" id="page-definicoes" aria-labelledby="page-title">
+        <div class="grid-2">
+          <article class="card"><header class="card-head"><h2><i class="fa-solid fa-user-gear"></i> Administrador da loja</h2></header><form id="settings-form"><div class="form-group"><label for="settings-admin-name">Nome</label><input id="settings-admin-name" type="text" maxlength="40" required></div><div class="form-group"><label for="settings-admin-role">Cargo</label><input id="settings-admin-role" type="text" maxlength="50" required></div><div class="form-group"><label for="settings-store-name">Nome da loja</label><input id="settings-store-name" type="text" maxlength="60" required></div><div class="form-group"><label for="settings-store-location">Localização</label><input id="settings-store-location" type="text" maxlength="100" required></div><div class="form-group"><label for="settings-payment">Método de pagamento predefinido</label><select id="settings-payment"><option value="cash">Dinheiro</option><option value="card">Cartão</option><option value="mbway">MB WAY</option><option value="transfer">Transferência bancária</option></select></div><footer class="modal-foot"><button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar definições</button></footer></form></article>
+          <article class="card settings-info"><header class="card-head"><h2><i class="fa-solid fa-sliders"></i> Preferências</h2></header><p class="muted">Personalize os dados apresentados na aplicação. As alterações são guardadas apenas neste navegador.</p><button class="btn btn-ghost" type="button" id="settings-theme-toggle"><i class="fa-solid fa-circle-half-stroke"></i> Alternar tema</button><div class="settings-note"><i class="fa-solid fa-shield-halved"></i><span>Os dados da loja e do administrador ficam guardados localmente.</span></div></article>
+        </div>
+      </section>
+
+      <!-- ======================= RELATÓRIOS ======================= -->
+      <section class="page" id="page-relatorios" aria-labelledby="page-title">
+        <article class="card">
+          <header class="card-head card-head-wrap">
+            <h2><i class="fa-solid fa-chart-line"></i> Indicadores do negócio</h2>
+            <button class="btn btn-primary" id="btn-export-report"><i class="fa-solid fa-file-excel"></i> Exportar relatório (Excel)</button>
+          </header>
+          <div class="stat-grid stat-grid-4" id="report-stats"></div>
+        </article>
+
+        <div class="grid-2">
+          <article class="card">
+            <header class="card-head"><h2><i class="fa-solid fa-ranking-star"></i> Vendas por produto</h2></header>
+            <div class="chart-holder chart-tall" id="chart-sales-by-product"></div>
+          </article>
+          <article class="card">
+            <header class="card-head"><h2><i class="fa-solid fa-euro-sign"></i> Faturação por produto</h2></header>
+            <div class="chart-holder chart-tall" id="chart-revenue-by-product"></div>
+          </article>
+        </div>
+
+        <div class="grid-2">
+          <article class="card">
+            <header class="card-head"><h2><i class="fa-solid fa-arrow-trend-up"></i> Evolução das vendas</h2></header>
+            <div class="chart-holder" id="chart-evolution"></div>
+          </article>
+          <article class="card">
+            <header class="card-head"><h2><i class="fa-solid fa-chart-pie"></i> Distribuição do stock</h2></header>
+            <div class="chart-holder" id="chart-stock-report"></div>
+          </article>
+        </div>
+
+        <article class="card">
+          <header class="card-head"><h2><i class="fa-solid fa-triangle-exclamation"></i> Produtos com stock baixo (≤ 3 unidades)</h2></header>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead><tr><th>Referência</th><th>Nome</th><th class="num">Stock</th><th class="num">Preço</th><th class="num">Valor em stock</th></tr></thead>
+              <tbody id="report-low-stock"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ======================= EMPRESA ======================= -->
+      <section class="page" id="page-empresa" aria-labelledby="page-title">
+        <article class="hero-card">
+          <div>
+            <span class="hero-tag">Sobre a empresa</span>
+            <h2>GereStock — tecnologia para o seu dia a dia</h2>
+            <p>Somos uma empresa focada em trazer inovação e tecnologia ao mercado.</p>
+          </div>
+          <span class="hero-illustration"><i class="fa-solid fa-microchip"></i></span>
+        </article>
+
+        <div class="grid-2">
+          <article class="card">
+            <header class="card-head"><h2><i class="fa-solid fa-users"></i> Quem somos</h2></header>
+            <p>Somos uma empresa focada em trazer inovação e tecnologia ao mercado.</p>
+            <p>A nossa missão é simplificar a gestão do dia a dia dos nossos clientes com soluções rápidas, fiáveis e ferramentas simples de usar.</p>
+            <ul class="feature-list">
+              <li><i class="fa-solid fa-check"></i> Atendimento especializado em informática</li>
+              <li><i class="fa-solid fa-check"></i> Equipamentos com garantia legal de 3 anos</li>
+              <li><i class="fa-solid fa-check"></i> Entregas em todo o país</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <header class="card-head"><h2><i class="fa-solid fa-box-open"></i> Produtos e serviços</h2></header>
+            <p>Dedicamo-nos à comercialização de equipamentos de informática e tecnologia.</p>
+            <p>Os nossos principais artigos incluem periféricos, ratos, teclados, monitores de alta definição, routers de rede e sistemas de impressão.</p>
+            <div class="tag-cloud">
+              <span class="tag">Periféricos</span>
+              <span class="tag">Ratos</span>
+              <span class="tag">Teclados</span>
+              <span class="tag">Monitores Full HD</span>
+              <span class="tag">Routers de rede</span>
+              <span class="tag">Impressão</span>
+              <span class="tag">Terminais portáteis</span>
+              <span class="tag">Computadores</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <header class="card-head"><h2><i class="fa-solid fa-location-dot"></i> Localização</h2></header>
+            <p><strong>Loja Física</strong></p>
+            <address>
+              Arrábida Shopping, Loja 1.24<br>
+              Vila Nova de Gaia, Portugal
+            </address>
+            <div class="map-illustration">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <span>Arrábida Shopping &middot; Loja 1.24</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <header class="card-head"><h2><i class="fa-regular fa-clock"></i> Horário</h2></header>
+            <ul class="hours-list">
+              <li><span>Segunda a Domingo</span><strong>10:00 — 23:00</strong></li>
+            </ul>
+            <p class="muted">Aberto todos os dias da semana, incluindo feriados, no horário de funcionamento do centro comercial.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ======================= FAQ ======================= -->
+      <section class="page" id="page-faq" aria-labelledby="page-title">
+        <article class="card">
+          <header class="card-head"><h2><i class="fa-solid fa-circle-question"></i> Perguntas frequentes</h2></header>
+          <div class="faq" id="faq-list">
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>Os produtos têm garantia?</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer"><p>Sim, todos os nossos equipamentos têm garantia legal de 3 anos.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>Fazem entregas ao domicílio?</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer"><p>Sim, enviamos para todo o país através de transportadora.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>Qual é o IVA aplicado às vendas?</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer"><p>Todas as vendas registadas no GereStock aplicam a taxa de IVA de 23% (taxa normal em Portugal continental). O sistema calcula automaticamente o subtotal, o IVA e o total de cada venda.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>Posso devolver ou trocar um produto?</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer"><p>Sim. Em compras na loja física dispõe de 14 dias para troca ou devolução, apresentando o comprovativo de compra e embalagem original. Em caso de avaria, aplica-se a garantia legal.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>Quais os métodos de pagamento aceites?</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer"><p>Aceitamos dinheiro, cartões de débito e crédito, MB WAY e transferência bancária para encomendas de maior valor.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>Onde ficam guardados os dados de stock e vendas?</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer"><p>Nesta versão web, todos os dados (produtos, vendas, stock e configurações) são guardados localmente no navegador através do localStorage. Isto significa que permanecem entre sessões neste dispositivo e navegador.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>É possível exportar os dados para análise?</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer"><p>Sim. Na página de Relatórios e no Histórico de Vendas pode exportar os dados para ficheiros Excel, compatíveis com Microsoft Excel, Google Sheets ou qualquer ferramenta de análise.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" aria-expanded="false">
+                <span>Fazem faturação para empresas?</span>
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="faq-answer"><p>Sim, emitimos fatura com NIF para empresas e profissionais. Basta indicar os dados de faturação no momento da compra.</p></div>
+            </div>
+
+          </div>
+        </article>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="footer-year"></span> <span id="footer-store-name">GereStock</span> &middot; <span id="footer-store-location">Arrábida Shopping, Loja 1.24, Vila Nova de Gaia</span> &middot; 10:00 — 23:00</p>
+    </footer>
+  </div>
+
+  <!-- ============ MODAL PRODUTO ============ -->
+  <div class="modal-overlay" id="product-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title">
+      <header class="modal-head">
+        <h2 id="product-modal-title">Adicionar produto</h2>
+        <button class="icon-btn" id="product-modal-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <form id="product-form" class="modal-body" novalidate>
+        <input type="hidden" id="product-id">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="product-ref">Referência</label>
+            <input type="text" id="product-ref" placeholder="ART011" readonly required>
+          </div>
+          <div class="form-group">
+            <label for="product-name">Nome</label>
+            <input type="text" id="product-name" placeholder="Ex.: Rato Optico USB" required>
+          </div>
+          <div class="form-group">
+            <label for="product-price">Preço (€, sem IVA)</label>
+            <input type="number" id="product-price" min="0" step="0.01" placeholder="20.90" required>
+          </div>
+          <div class="form-group">
+            <label for="product-stock">Stock</label>
+            <input type="number" id="product-stock" min="0" step="1" placeholder="100" required>
+          </div>
+          <div class="form-group">
+            <label for="product-min-stock">Stock mínimo</label>
+            <input type="number" id="product-min-stock" min="0" step="1" value="3" required>
+          </div>
+          <div class="form-group">
+            <label for="product-category">Categoria</label>
+            <input type="text" id="product-category" maxlength="60" placeholder="Ex.: Periféricos">
+          </div>
+          <div class="form-group">
+            <label for="product-supplier">Fornecedor</label>
+            <select id="product-supplier"><option value="">Sem fornecedor</option></select>
+          </div>
+        </div>
+        <p class="alert" id="product-alert" hidden></p>
+        <footer class="modal-foot">
+          <button type="button" class="btn btn-ghost" id="product-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar produto</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ MODAL REPOR STOCK ============ -->
+  <div class="modal-overlay" id="restock-modal" hidden>
+    <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="restock-title">
+      <header class="modal-head">
+        <h2 id="restock-title">Repor stock</h2>
+        <button class="icon-btn" id="restock-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <form id="restock-form" class="modal-body" novalidate>
+        <p class="muted" id="restock-product-label">—</p>
+        <div class="form-group">
+          <label for="restock-qty">Unidades a adicionar</label>
+          <input type="number" id="restock-qty" min="1" step="1" value="10" required>
+        </div>
+        <p class="alert" id="restock-alert" hidden></p>
+        <footer class="modal-foot">
+          <button type="button" class="btn btn-ghost" id="restock-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Adicionar stock</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ MODAL CONFIRMAÇÃO ============ -->
+  <div class="modal-overlay" id="confirm-modal" hidden>
+    <div class="modal modal-sm" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <header class="modal-head">
+        <h2 id="confirm-title">Confirmar ação</h2>
+        <button class="icon-btn" id="confirm-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div class="modal-body">
+        <p id="confirm-message">Tem a certeza?</p>
+        <footer class="modal-foot">
+          <button type="button" class="btn btn-ghost" id="confirm-cancel">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="confirm-ok"><i class="fa-solid fa-trash"></i> Confirmar</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL CLIENTE ============ -->
+  <div class="modal-overlay" id="client-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="client-modal-title">
+      <header class="modal-head">
+        <h2 id="client-modal-title">Novo cliente</h2>
+        <button class="icon-btn" id="client-modal-close" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <form id="client-form" class="modal-body" novalidate>
+        <input type="hidden" id="client-id">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="client-name">Nome *</label>
+            <input type="text" id="client-name" placeholder="Nome do cliente" required>
+          </div>
+          <div class="form-group">
+            <label for="client-nif">NIF (opcional)</label>
+            <input type="text" id="client-nif" inputmode="numeric" pattern="[0-9]{9}" maxlength="9" autocomplete="off" placeholder="123456789">
+          </div>
+          <div class="form-group">
+            <label for="client-phone">Telefone *</label>
+            <input type="text" id="client-phone" inputmode="numeric" pattern="[0-9]{9}" maxlength="9" autocomplete="tel" placeholder="912345678" required>
+          </div>
+          <div class="form-group">
+            <label for="client-email">Email *</label>
+            <input type="email" id="client-email" placeholder="cliente@email.com" autocomplete="email" required>
+          </div>
+          <div class="form-group form-group-full">
+            <label for="client-address">Morada</label>
+            <input type="text" id="client-address" placeholder="Morada do cliente">
+          </div>
+        </div>
+        <p class="alert" id="client-alert" hidden></p>
+        <footer class="modal-foot">
+          <button type="button" class="btn btn-ghost" id="client-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar cliente</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ MODAL FORNECEDOR ============ -->
+  <div class="modal-overlay" id="supplier-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="supplier-modal-title">
+      <header class="modal-head">
+        <h2 id="supplier-modal-title">Novo fornecedor</h2>
+        <button class="icon-btn" id="supplier-modal-close" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <form id="supplier-form" class="modal-body" novalidate>
+        <input type="hidden" id="supplier-id">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="supplier-name">Empresa *</label>
+            <input type="text" id="supplier-name" placeholder="Nome da empresa" required>
+          </div>
+          <div class="form-group">
+            <label for="supplier-nif">NIF *</label>
+            <input type="text" id="supplier-nif" inputmode="numeric" pattern="[0-9]{9}" maxlength="9" autocomplete="off" placeholder="123456789" required>
+          </div>
+          <div class="form-group">
+            <label for="supplier-phone">Telefone *</label>
+            <input type="text" id="supplier-phone" inputmode="numeric" pattern="[0-9]{9}" maxlength="9" autocomplete="tel" placeholder="912345678" required>
+          </div>
+          <div class="form-group">
+            <label for="supplier-email">Email *</label>
+            <input type="email" id="supplier-email" placeholder="geral@empresa.pt" autocomplete="email" required>
+          </div>
+          <div class="form-group form-group-full">
+            <label for="supplier-address">Morada</label>
+            <input type="text" id="supplier-address" placeholder="Morada da empresa">
+          </div>
+        </div>
+        <p class="alert" id="supplier-alert" hidden></p>
+        <footer class="modal-foot">
+          <button type="button" class="btn btn-ghost" id="supplier-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar fornecedor</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ NOTIFICAÇÕES ============ -->
+  <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+/* ============================================================
+   GereStock — script.js
+   JavaScript puro (Vanilla JS) · dados em localStorage
+   ============================================================ */
+'use strict';
+
+/* ------------------------------------------------------------
+   1. CONSTANTES E ESTADO
+   ------------------------------------------------------------ */
+const KEYS = {
+  products: 'gerestock_products_v1',
+  sales: 'gerestock_sales_v1',
+  settings: 'gerestock_settings_v1',
+  clients: 'gerestock_clients_v1',
+  suppliers: 'gerestock_suppliers_v1',
+  movements: 'gerestock_movements_v1'
+};
+
+const VAT_RATE = 23;          // taxa de IVA (23%)
+const LOW_STOCK = 3;          // limite de stock crítico
+const MEDIUM_STOCK = 20;      // limite de stock reduzido
+const PAGE_SIZE = 10;         // linhas por página no histórico
+
+const state = {
+  products: [],
+  sales: [],
+  clients: [],
+  suppliers: [],
+  movements: [],
+  settings: { theme: 'light', counter: 0, adminName: 'Admin', adminRole: 'Gestor de loja', storeName: 'GereStock', storeLocation: 'Arrábida Shopping, Loja 1.24, Vila Nova de Gaia', defaultPayment: 'card' },
+  filters: {
+    inventory: { search: '', stock: 'all', price: 'all', sort: 'name-asc' },
+    history: { search: '', product: 'all', date: '', sort: 'recent', page: 1 }
+  }
+};
+
+/* Páginas: título, subtítulo e gráficos associados */
+const PAGES = {
+  inicio:     { title: 'Página Inicial',      subtitle: 'Visão geral da sua loja', chartIds: [] },
+  dashboard:  { title: 'Dashboard',          subtitle: 'Resumo geral do negócio', chartIds: ['chart-fat', 'chart-stock', 'chart-products'] },
+  inventario: { title: 'Inventário',         subtitle: 'Gestão de produtos e stock', chartIds: [] },
+  venda:      { title: 'Registar Venda',     subtitle: 'Ponto de venda (POS)', chartIds: [] },
+  historico:  { title: 'Histórico de Vendas', subtitle: 'Todas as vendas registadas', chartIds: [] },
+  clientes:   { title: 'Clientes', subtitle: 'Gestão e histórico de clientes', chartIds: [] },
+  fornecedores:{ title: 'Fornecedores', subtitle: 'Gestão de fornecedores', chartIds: [] },
+  movimentos: { title: 'Movimentos de Stock', subtitle: 'Entradas e saídas do inventário', chartIds: [] },
+  relatorios: { title: 'Relatórios',         subtitle: 'Análise de vendas e stock', chartIds: ['chart-sales-by-product', 'chart-revenue-by-product', 'chart-evolution', 'chart-stock-report'] },
+  empresa:    { title: 'Empresa',            subtitle: 'Quem somos, produtos e contactos', chartIds: [] },
+  faq:        { title: 'FAQ',                subtitle: 'Perguntas frequentes', chartIds: [] },
+  definicoes: { title: 'Definições',         subtitle: 'Administrador, loja e preferências', chartIds: [] }
+};
+
+/* ------------------------------------------------------------
+   2. UTILITÁRIOS
+   ------------------------------------------------------------ */
+const $  = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+const money = new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' });
+const num = new Intl.NumberFormat('pt-PT');
+
+function fmtMoney(v) { return money.format(Number(v) || 0); }
+function fmtNum(v) { return num.format(Number(v) || 0); }
+function fmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+         ' ' + d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+}
+function fmtDateShort(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' });
+}
+function sum(list, fn) { return list.reduce((acc, item) => acc + (Number(fn(item)) || 0), 0); }
+function uid() {
+  return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+function esc(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function round2(v) { return Math.round((Number(v) + Number.EPSILON) * 100) / 100; }
+const PAYMENT_METHODS = { cash: 'Dinheiro', card: 'Cartão', mbway: 'MB WAY', transfer: 'Transferência bancária' };
+function paymentLabel(value) { return PAYMENT_METHODS[value] || 'Não registado'; }
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#2563eb';
+}
+
+/* Cálculo de valores de uma venda (IVA incluído no total) */
+function computeSale(unitPrice, qty) {
+  const subtotal = round2(unitPrice * qty);
+  const vat = round2(subtotal * (VAT_RATE / 100));
+  const total = round2(subtotal + vat);
+  return { subtotal, vat, total };
+}
+
+/* Classe de estado do stock */
+function stockStatus(stock) {
+  if (stock <= LOW_STOCK)   return { key: 'crit', label: 'Crítico',  cls: 'crit' };
+  if (stock <= MEDIUM_STOCK) return { key: 'warn', label: 'Reduzido', cls: 'warn' };
+  return { key: 'ok', label: 'Normal', cls: 'ok' };
+}
+
+/* ------------------------------------------------------------
+   3. PERSISTÊNCIA (localStorage)
+   ------------------------------------------------------------ */
+function saveProducts() {
+  localStorage.setItem(KEYS.products, JSON.stringify(state.products));
+}
+function saveSales() {
+  localStorage.setItem(KEYS.sales, JSON.stringify(state.sales));
+}
+function saveSettings() { localStorage.setItem(KEYS.settings, JSON.stringify(state.settings)); }
+function saveClients() { localStorage.setItem(KEYS.clients, JSON.stringify(state.clients)); }
+function saveSuppliers() { localStorage.setItem(KEYS.suppliers, JSON.stringify(state.suppliers)); }
+function saveMovements() { localStorage.setItem(KEYS.movements, JSON.stringify(state.movements)); }
+
+function loadData() {
+  const readJSON = (key, fallback) => {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (err) {
+      console.warn('Dados inválidos em ' + key + ', a usar valores padrão.', err);
+      return fallback;
+    }
+  };
+
+  state.products = readJSON(KEYS.products, null) || [];
+  state.sales = readJSON(KEYS.sales, null) || [];
+  state.clients = readJSON(KEYS.clients, null) || [];
+  state.suppliers = readJSON(KEYS.suppliers, null) || [];
+  state.movements = readJSON(KEYS.movements, null) || [];
+  const settings = readJSON(KEYS.settings, null);
+  if (settings && typeof settings === 'object') {
+    state.settings = Object.assign({ theme: 'light', counter: 0, adminName: 'Admin', adminRole: 'Gestor de loja', storeName: 'GereStock', storeLocation: 'Arrábida Shopping, Loja 1.24, Vila Nova de Gaia', defaultPayment: 'card' }, settings);
+  }
+
+  // Primeira utilização: carregar dados iniciais automaticamente
+  if (!state.products.length && !localStorage.getItem(KEYS.products)) {
+    seedInitialData();
+  }
+}
+
+/* ------------------------------------------------------------
+   4. DADOS INICIAIS (seed da primeira utilização)
+   ------------------------------------------------------------ */
+const SEED_PRODUCTS = [
+  { ref: 'ART001', name: 'Rato Optico USB',                price: 20.90,  stock: 100 },
+  { ref: 'ART002', name: 'Teclado Mecanico PT',            price: 55.00,  stock: 120 },
+  { ref: 'ART003', name: 'Monitor 24 Full HD',             price: 129.90, stock: 30  },
+  { ref: 'ART004', name: 'Cabo HDMI 2m',                   price: 10.50,  stock: 120 },
+  { ref: 'ART005', name: 'Impressora Jato tinta',          price: 80.50,  stock: 70  },
+  { ref: 'ART006', name: 'Zebra TC21 Terminal Portatil',   price: 500.00, stock: 100 },
+  { ref: 'ART007', name: 'TECURS Teclado e Rato Sem Fios', price: 30.00,  stock: 120 },
+  { ref: 'ART008', name: 'Cartao microSD SDCS2/32GB',      price: 20.00,  stock: 60  },
+  { ref: 'ART009', name: 'Router WiFi 6 AX3000',           price: 95.00,  stock: 60  },
+  { ref: 'ART010', name: 'ThinkPad P14s Gen 6',            price: 1999.00, stock: 60 }
+];
+
+/* Vendas de demonstração (dias atrás, hora, referência, quantidade) */
+const SEED_SALES = [
+  { d: 6, h: 10, ref: 'ART001', qty: 3 },
+  { d: 6, h: 15, ref: 'ART004', qty: 5 },
+  { d: 5, h: 11, ref: 'ART002', qty: 2 },
+  { d: 5, h: 18, ref: 'ART008', qty: 4 },
+  { d: 4, h: 12, ref: 'ART010', qty: 1 },
+  { d: 4, h: 16, ref: 'ART003', qty: 2 },
+  { d: 3, h: 10, ref: 'ART007', qty: 3 },
+  { d: 3, h: 19, ref: 'ART006', qty: 1 },
+  { d: 2, h: 13, ref: 'ART005', qty: 2 },
+  { d: 2, h: 17, ref: 'ART009', qty: 1 },
+  { d: 1, h: 11, ref: 'ART001', qty: 2 },
+  { d: 1, h: 20, ref: 'ART002', qty: 1 },
+  { d: 0, h: 10, ref: 'ART004', qty: 6 },
+  { d: 0, h: 14, ref: 'ART010', qty: 1 }
+];
+
+function seedInitialData() {
+  const now = Date.now();
+
+  state.products = SEED_PRODUCTS.map((p, i) => ({
+    id: uid() + i,
+    ref: p.ref,
+    name: p.name,
+    price: p.price,
+    stock: p.stock,
+    createdAt: now,
+    updatedAt: now, minStock: 3, category: 'Informática', supplierId: ''
+  }));
+
+  let counter = 0;
+  state.sales = SEED_SALES.map((s) => {
+    const product = state.products.find((p) => p.ref === s.ref);
+    const date = new Date();
+    date.setDate(date.getDate() - s.d);
+    date.setHours(s.h, (counter * 7) % 60, 0, 0);
+    const values = computeSale(product.price, s.qty);
+    counter += 1;
+    return {
+      id: counter,
+      productId: product.id,
+      productName: product.name,
+      productRef: product.ref,
+      unitPrice: product.price,
+      qty: s.qty,
+      subtotal: values.subtotal,
+      vat: values.vat,
+      total: values.total,
+      vatRate: VAT_RATE,
+      date: date.toISOString()
+    };
+  });
+
+  state.settings.counter = counter;
+
+  saveProducts();
+  saveSales();
+  saveSettings();
+}
+
+/* ------------------------------------------------------------
+   5. NOTIFICAÇÕES (toasts)
+   ------------------------------------------------------------ */
+const ICONS = { success: 'fa-circle-check', error: 'fa-circle-exclamation', info: 'fa-circle-info' };
+
+function toast(message, type = 'success', title = '') {
+  const container = $('#toast-container');
+  const box = document.createElement('div');
+  box.className = 'toast ' + type;
+  box.innerHTML =
+    '<i class="fa-solid ' + (ICONS[type] || ICONS.info) + '"></i>' +
+    '<div>' + (title ? '<strong>' + esc(title) + '</strong>' : '') + '<span>' + esc(message) + '</span></div>';
+  container.appendChild(box);
+  setTimeout(() => {
+    box.classList.add('hide');
+    setTimeout(() => box.remove(), 320);
+  }, 3600);
+}
+
+/* ------------------------------------------------------------
+   6. MODAIS
+   ------------------------------------------------------------ */
+function openModal(id) {
+  const m = document.getElementById(id);
+  m.hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  const m = document.getElementById(id);
+  m.hidden = true;
+  document.body.style.overflow = '';
+}
+function showAlert(el, message, type = 'error') {
+  el.textContent = message;
+  el.className = 'alert ' + type;
+  el.hidden = false;
+}
+function hideAlert(el) { el.hidden = true; }
+
+/* Confirmação genérica */
+let confirmCallback = null;
+function askConfirm(message, onOk, okLabel = 'Confirmar') {
+  $('#confirm-message').textContent = message;
+  const ok = $('#confirm-ok');
+  ok.innerHTML = '<i class="fa-solid fa-check"></i> ' + esc(okLabel);
+  confirmCallback = onOk;
+  openModal('confirm-modal');
+}
+
+/* ------------------------------------------------------------
+   7. GRÁFICOS (SVG gerados em JavaScript)
+   ------------------------------------------------------------ */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const charts = {};   // id -> { el, draw }
+
+function registerChart(id, draw) {
+  const el = document.getElementById(id);
+  if (el) charts[id] = { el, draw };
+}
+
+function svgNode(tag, attrs) {
+  const node = document.createElementNS(SVGNS, tag);
+  if (attrs) {
+    for (const key in attrs) node.setAttribute(key, attrs[key]);
+  }
+  return node;
+}
+
+function chartBox(holder) {
+  const w = Math.max(holder.clientWidth || 0, 240);
+  const h = Math.max(holder.clientHeight || 0, 180);
+  holder.innerHTML = '';
+  const svg = svgNode('svg', { viewBox: '0 0 ' + w + ' ' + h, preserveAspectRatio: 'none', role: 'img' });
+  svg.setAttribute('width', w);
+  svg.setAttribute('height', h);
+  svg.style.overflow = 'visible';
+  holder.appendChild(svg);
+  return { svg, w, h };
+}
+
+function emptyChart(holder, message) {
+  holder.innerHTML = '<div class="chart-empty">' + esc(message) + '</div>';
+}
+
+/* Escala "bonita" para o eixo Y */
+function niceMax(max) {
+  if (!max || max <= 0) return 10;
+  const pow = Math.pow(10, Math.floor(Math.log10(max)));
+  const norm = max / pow;
+  const step = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10;
+  return step * pow;
+}
+function shortMoney(v) {
+  if (v >= 1000) return (v / 1000).toFixed(v >= 10000 ? 0 : 1).replace('.', ',') + ' k€';
+  return fmtMoney(v).replace(/\s?€/, '€');
+}
+function palette() {
+  return [
+    cssVar('--brand'), cssVar('--green'), cssVar('--violet'),
+    cssVar('--cyan'), cssVar('--amber'), cssVar('--red')
+  ];
+}
+
+/* --- Barras verticais --- */
+function drawBarChart(holder, data, opts = {}) {
+  if (!data.length) { emptyChart(holder, 'Sem dados para apresentar.'); return; }
+  const { svg, w, h } = chartBox(holder);
+  const pad = { top: 16, right: 18, bottom: 38, left: opts.money === false ? 44 : 58 };
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+  const max = niceMax(Math.max(...data.map((d) => d.value)));
+  const gridColor = cssVar('--border');
+  const textColor = cssVar('--text-soft');
+  const accent = cssVar('--brand');
+
+  // linhas de grelha + etiquetas Y
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (plotH * i) / 4;
+    svg.appendChild(svgNode('line', {
+      x1: pad.left, x2: w - pad.right, y1: y, y2: y,
+      stroke: gridColor, 'stroke-width': 1, 'stroke-dasharray': i === 4 ? '0' : '4 4'
+    }));
+    const label = svgNode('text', {
+      x: pad.left - 10, y: y + 4, 'text-anchor': 'end',
+      'font-size': 10, fill: textColor
+    });
+    label.textContent = shortMoney((max * (4 - i)) / 4);
+    svg.appendChild(label);
+  }
+
+  const slot = plotW / data.length;
+  const barW = Math.min(slot * 0.6, 54);
+
+  data.forEach((d, i) => {
+    const bh = max > 0 ? (d.value / max) * plotH : 0;
+    const x = pad.left + slot * i + (slot - barW) / 2;
+    const y = pad.top + plotH - bh;
+
+    const bar = svgNode('rect', { x, y, width: barW, height: Math.max(bh, 0), rx: Math.min(7, barW / 2) });
+    bar.style.fill = d.color || accent;
+    bar.style.opacity = 0.92;
+    bar.setAttribute('class', 'chart-bar');
+    const tip = svgNode('title');
+    tip.textContent = d.label + ': ' + (opts.money === false ? fmtNum(d.value) : fmtMoney(d.value));
+    bar.appendChild(tip);
+    svg.appendChild(bar);
+
+    const xLabel = svgNode('text', {
+      x: x + barW / 2, y: h - pad.bottom + 18, 'text-anchor': 'middle',
+      'font-size': 10.5, fill: textColor
+    });
+    xLabel.textContent = d.label;
+    svg.appendChild(xLabel);
+  });
+}
+
+/* --- Barras horizontais --- */
+function drawHBarChart(holder, data, opts = {}) {
+  if (!data.length) { emptyChart(holder, 'Sem dados para apresentar.'); return; }
+  const { svg, w, h } = chartBox(holder);
+  const labelW = Math.min(Math.max(w * 0.3, 110), 210);
+  const pad = { top: 12, right: 74, bottom: 12, left: labelW + 12 };
+  const plotW = Math.max(w - pad.left - pad.right, 60);
+  const rowH = (h - pad.top - pad.bottom) / data.length;
+  const barH = Math.min(rowH * 0.62, 30);
+  const max = niceMax(Math.max(...data.map((d) => d.value)));
+  const textColor = cssVar('--text-soft');
+  const colors = palette();
+
+  data.forEach((d, i) => {
+    const y = pad.top + rowH * i + (rowH - barH) / 2;
+    const bw = max > 0 ? (d.value / max) * plotW : 0;
+
+    const name = svgNode('text', {
+      x: labelW, y: y + barH / 2 + 4, 'text-anchor': 'end',
+      'font-size': 11.5, fill: textColor
+    });
+    name.textContent = d.label.length > 26 ? d.label.slice(0, 25) + '…' : d.label;
+    const nameTip = svgNode('title');
+    nameTip.textContent = d.label;
+    name.appendChild(nameTip);
+    svg.appendChild(name);
+
+    svg.appendChild(svgNode('rect', {
+      x: pad.left, y, width: plotW, height: barH, rx: barH / 2, fill: cssVar('--surface-2'),
+      stroke: cssVar('--border'), 'stroke-width': 1
+    }));
+
+    const bar = svgNode('rect', { x: pad.left, y, width: Math.max(bw, 2), height: barH, rx: barH / 2 });
+    bar.style.fill = d.color || colors[i % colors.length];
+    bar.setAttribute('class', 'chart-bar');
+    const tip = svgNode('title');
+    tip.textContent = d.label + ': ' + (opts.money === false ? fmtNum(d.value) : fmtMoney(d.value));
+    bar.appendChild(tip);
+    svg.appendChild(bar);
+
+    const value = svgNode('text', {
+      x: pad.left + Math.max(bw, 2) + 8, y: y + barH / 2 + 4,
+      'font-size': 11, fill: textColor, 'font-weight': 600
+    });
+    value.textContent = opts.money === false ? fmtNum(d.value) : shortMoney(d.value);
+    svg.appendChild(value);
+  });
+}
+
+/* --- Gráfico circular (doughnut) --- */
+function drawDoughnut(holder, data, centerLabel) {
+  const total = sum(data, (d) => d.value);
+  if (!data.length || total <= 0) { emptyChart(holder, 'Sem dados para apresentar.'); return; }
+  const { svg, w, h } = chartBox(holder);
+  const legendRight = w >= 430;
+  const size = Math.min(legendRight ? w * 0.5 : w, h - 10, 240);
+  const cx = legendRight ? size / 2 + 8 : w / 2;
+  const cy = legendRight ? h / 2 : size / 2 + 4;
+  const rOuter = size / 2 - 6;
+  const rInner = rOuter * 0.6;
+  const textColor = cssVar('--text-soft');
+  const strongColor = cssVar('--text');
+
+  const active = data.filter((d) => d.value > 0);
+
+  if (active.length === 1) {
+    // Caso especial: uma única fatia — um arco completo colapsaria num path vazio
+    const ring = svgNode('circle', { cx, cy, r: (rOuter + rInner) / 2, fill: 'none', stroke: active[0].color, 'stroke-width': rOuter - rInner });
+    const tipOnly = svgNode('title');
+    tipOnly.textContent = active[0].label + ': ' + fmtNum(active[0].value) + ' (100%)';
+    ring.appendChild(tipOnly);
+    svg.appendChild(ring);
+  } else {
+    let angle = -Math.PI / 2;
+    data.forEach((d) => {
+      const slice = (d.value / total) * Math.PI * 2;
+      if (slice <= 0) return;
+      const path = svgNode('path', { d: arcPath(cx, cy, rOuter, rInner, angle, angle + slice) });
+      path.style.fill = d.color;
+      path.setAttribute('class', 'chart-bar');
+      const tip = svgNode('title');
+      tip.textContent = d.label + ': ' + fmtNum(d.value) + ' (' + Math.round((d.value / total) * 100) + '%)';
+      path.appendChild(tip);
+      svg.appendChild(path);
+      angle += slice;
+    });
+  }
+
+  const center = svgNode('text', {
+    x: cx, y: cy + 2, 'text-anchor': 'middle', 'font-size': 20,
+    'font-weight': 700, fill: strongColor
+  });
+  center.textContent = fmtNum(total);
+  svg.appendChild(center);
+
+  const cap = svgNode('text', {
+    x: cx, y: cy + 20, 'text-anchor': 'middle', 'font-size': 10.5, fill: textColor
+  });
+  cap.textContent = centerLabel || 'total';
+  svg.appendChild(cap);
+
+  // legenda
+  const items = data.filter((d) => d.value > 0);
+  const lx = legendRight ? size + 26 : 10;
+  let ly = legendRight ? Math.max(20, h / 2 - items.length * 11) : size + 16;
+  items.forEach((d) => {
+    const dot = svgNode('rect', { x: lx, y: ly - 8, width: 10, height: 10, rx: 3 });
+    dot.style.fill = d.color;
+    svg.appendChild(dot);
+
+    const txt = svgNode('text', { x: lx + 16, y: ly + 1, 'font-size': 11, fill: textColor });
+    const pct = Math.round((d.value / total) * 100);
+    txt.textContent = d.label + ' — ' + fmtNum(d.value) + ' (' + pct + '%)';
+    svg.appendChild(txt);
+
+    ly += legendRight ? 22 : 20;
+  });
+}
+
+function arcPath(cx, cy, rOuter, rInner, start, end) {
+  const pt = (r, a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  const large = end - start > Math.PI ? 1 : 0;
+  const [x1, y1] = pt(rOuter, start);
+  const [x2, y2] = pt(rOuter, end);
+  const [x3, y3] = pt(rInner, end);
+  const [x4, y4] = pt(rInner, start);
+  return 'M' + x1 + ',' + y1 +
+         ' A' + rOuter + ',' + rOuter + ' 0 ' + large + ' 1 ' + x2 + ',' + y2 +
+         ' L' + x3 + ',' + y3 +
+         ' A' + rInner + ',' + rInner + ' 0 ' + large + ' 0 ' + x4 + ',' + y4 + ' Z';
+}
+
+/* --- Gráfico de linha (evolução) --- */
+function drawLineChart(holder, data, opts = {}) {
+  if (data.length < 2) { emptyChart(holder, 'Dados insuficientes para a evolução.'); return; }
+  const { svg, w, h } = chartBox(holder);
+  const pad = { top: 18, right: 22, bottom: 40, left: 58 };
+  const plotW = w - pad.left - pad.right;
+  const plotH = h - pad.top - pad.bottom;
+  const max = niceMax(Math.max(...data.map((d) => d.value)));
+  const gridColor = cssVar('--border');
+  const textColor = cssVar('--text-soft');
+  const brand = cssVar('--brand');
+
+  const defs = svgNode('defs');
+  const grad = svgNode('linearGradient', { id: 'lineGrad', x1: 0, y1: 0, x2: 0, y2: 1 });
+  const s1 = svgNode('stop', { offset: '0%' }); s1.style.stopColor = brand; s1.style.stopOpacity = 0.35;
+  const s2 = svgNode('stop', { offset: '100%' }); s2.style.stopColor = brand; s2.style.stopOpacity = 0.02;
+  grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (plotH * i) / 4;
+    svg.appendChild(svgNode('line', {
+      x1: pad.left, x2: w - pad.right, y1: y, y2: y,
+      stroke: gridColor, 'stroke-dasharray': i === 4 ? '0' : '4 4'
+    }));
+    const label = svgNode('text', { x: pad.left - 10, y: y + 4, 'text-anchor': 'end', 'font-size': 10, fill: textColor });
+    label.textContent = opts.money === false ? fmtNum(Math.round((max * (4 - i)) / 4)) : shortMoney((max * (4 - i)) / 4);
+    svg.appendChild(label);
+  }
+
+  const stepX = plotW / (data.length - 1);
+  const points = data.map((d, i) => ({
+    x: pad.left + stepX * i,
+    y: pad.top + plotH - (max > 0 ? (d.value / max) * plotH : 0),
+    d
+  }));
+
+  const line = points.map((p) => p.x + ',' + p.y).join(' ');
+  const area = svgNode('polygon', {
+    points: pad.left + ',' + (pad.top + plotH) + ' ' + line + ' ' + (pad.left + plotW) + ',' + (pad.top + plotH),
+    fill: 'url(#lineGrad)'
+  });
+  svg.appendChild(area);
+  svg.appendChild(svgNode('polyline', {
+    points: line, fill: 'none', stroke: brand, 'stroke-width': 2.4,
+    'stroke-linejoin': 'round', 'stroke-linecap': 'round'
+  }));
+
+  points.forEach((p) => {
+    const dot = svgNode('circle', { cx: p.x, cy: p.y, r: 4, fill: cssVar('--surface'), stroke: brand, 'stroke-width': 2.2 });
+    const tip = svgNode('title');
+    tip.textContent = p.d.label + ': ' + (opts.money === false ? fmtNum(p.d.value) : fmtMoney(p.d.value));
+    dot.appendChild(tip);
+    dot.setAttribute('class', 'chart-bar');
+    svg.appendChild(dot);
+
+    if (p.d.label) {
+      const t = svgNode('text', {
+        x: p.x, y: h - pad.bottom + 18, 'text-anchor': 'middle', 'font-size': 10, fill: textColor
+      });
+      t.textContent = p.d.label;
+      svg.appendChild(t);
+    }
+  });
+}
+
+/* Re-render dos gráficos de uma página */
+function renderCharts(ids) {
+  ids.forEach((id) => {
+    const chart = charts[id];
+    if (chart && chart.el && chart.el.clientWidth > 40) chart.draw(chart.el);
+  });
+}
+function renderAllCharts() {
+  Object.keys(charts).forEach((id) => {
+    const chart = charts[id];
+    if (chart && chart.el && chart.el.clientWidth > 40 && chart.el.offsetParent !== null) chart.draw(chart.el);
+  });
+}
+
+/* ------------------------------------------------------------
+   8. AGREGADOS / ESTATÍSTICAS
+   ------------------------------------------------------------ */
+function getStats() {
+  const products = state.products;
+  const sales = state.sales;
+  const totalStock = sum(products, (p) => p.stock);
+  const lowProducts = products.filter((p) => p.stock <= LOW_STOCK);
+
+  // agregações por produto
+  const byProduct = new Map();
+  sales.forEach((s) => {
+    const key = s.productRef || s.productName;
+    const entry = byProduct.get(key) || { ref: s.productRef, name: s.productName, qty: 0, revenue: 0, vat: 0 };
+    entry.qty += s.qty;
+    entry.revenue = round2(entry.revenue + s.total);
+    entry.vat = round2(entry.vat + s.vat);
+    byProduct.set(key, entry);
+  });
+  const productSales = Array.from(byProduct.values());
+
+  const bestSeller = productSales.slice().sort((a, b) => b.qty - a.qty)[0] || null;
+  const topRevenue = productSales.slice().sort((a, b) => b.revenue - a.revenue)[0] || null;
+
+  return {
+    totalProducts: products.length,
+    totalStock,
+    stockValue: round2(sum(products, (p) => p.price * p.stock)),
+    salesCount: sales.length,
+    revenue: round2(sum(sales, (s) => s.total)),
+    vatTotal: round2(sum(sales, (s) => s.vat)),
+    netTotal: round2(sum(sales, (s) => s.subtotal)),
+    avgTicket: sales.length ? round2(sum(sales, (s) => s.total) / sales.length) : 0,
+    lowProducts,
+    lowCount: lowProducts.length,
+    productSales,
+    bestSeller,
+    topRevenue
+  };
+}
+
+/* Dados para gráficos temporais */
+function lastDaysSeries(days, moneyBased) {
+  const out = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - i);
+    const next = new Date(d);
+    next.setDate(next.getDate() + 1);
+    const daySales = state.sales.filter((s) => {
+      const t = new Date(s.date).getTime();
+      return t >= d.getTime() && t < next.getTime();
+    });
+    out.push({
+      label: d.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }),
+      value: moneyBased ? round2(sum(daySales, (s) => s.total)) : daySales.length
+    });
+  }
+  return out;
+}
+
+/* Cartões de estatística com animação numérica */
+function renderStats(container, cards) {
+  container.innerHTML = '';
+  cards.forEach((c) => {
+    const article = document.createElement('article');
+    article.className = 'stat-card';
+    article.style.setProperty('--accent', c.accent || 'var(--brand)');
+    article.innerHTML =
+      '<div class="stat-top">' +
+        '<span class="stat-label">' + esc(c.label) + '</span>' +
+        '<span class="stat-icon"><i class="' + c.icon + '"></i></span>' +
+      '</div>' +
+      '<p class="stat-value"></p>' +
+      '<p class="stat-foot">' + (c.foot || '') + '</p>';
+    container.appendChild(article);
+
+    const valueEl = article.querySelector('.stat-value');
+    if (typeof c.value === 'number' && c.format) {
+      animateValue(valueEl, c.value, c.format);
+    } else {
+      valueEl.textContent = c.display || '';
+    }
+  });
+}
+
+function animateValue(el, target, format) {
+  const duration = 620;
+  const start = performance.now();
+  const from = 0;
+  function frame(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = format(from + (target - from) * eased);
+    if (p < 1) requestAnimationFrame(frame);
+    else el.textContent = format(target);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ------------------------------------------------------------
+   9. NAVEGAÇÃO (router por hash)
+   ------------------------------------------------------------ */
+function navigate(page, push = true) {
+  if (!PAGES[page]) page = 'dashboard';
+  const config = PAGES[page];
+
+  $$('.page').forEach((section) => section.classList.toggle('active', section.id === 'page-' + page));
+  $$('.nav-item').forEach((item) => item.classList.toggle('active', item.dataset.page === page));
+
+  $('#page-title').textContent = config.title;
+  $('#page-subtitle').textContent = config.subtitle;
+  document.title = config.title + ' · GereStock';
+
+  if (push && location.hash !== '#' + page) location.hash = '#' + page;
+
+  renderPage(page);
+  closeSidebar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderPage(page) {
+  if (page === 'inicio') renderHome();
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'inventario') renderInventory();
+  if (page === 'venda') renderPOS();
+  if (page === 'historico') renderHistory();
+  if (page === 'clientes') renderClients();
+  if (page === 'fornecedores') renderSuppliers();
+  if (page === 'movimentos') renderMovements();
+  if (page === 'relatorios') renderReports();
+  if (page === 'definicoes') renderSettings();
+  requestAnimationFrame(() => renderCharts(PAGES[page].chartIds));
+}
+
+function updateBranding() {
+  const s = state.settings;
+  const initials = (s.adminName || 'Admin').trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'AD';
+  $('#admin-avatar').textContent = initials;
+  $('#admin-name-display').textContent = s.adminName;
+  $('#admin-role-display').textContent = s.adminRole;
+  $('#home-admin-name').textContent = s.adminName;
+  $('#home-store-name').textContent = s.storeName;
+  $('#home-store-location').textContent = s.storeLocation;
+  $('#home-payment-method').textContent = paymentLabel(s.defaultPayment);
+  $('#footer-store-name').textContent = s.storeName;
+  $('#footer-store-location').textContent = s.storeLocation;
+}
+
+function renderHome() {
+  const s = getStats();
+  updateBranding();
+  renderStats($('#home-stats'), [
+    { label: 'Faturação total', value: s.revenue, format: fmtMoney, icon: 'fa-solid fa-euro-sign', accent: 'var(--green)', foot: 'IVA incluído' },
+    { label: 'Vendas registadas', value: s.salesCount, format: fmtNum, icon: 'fa-solid fa-receipt', accent: 'var(--brand)', foot: 'Ticket médio: ' + fmtMoney(s.avgTicket) },
+    { label: 'Stock baixo', value: s.lowCount, format: fmtNum, icon: 'fa-solid fa-triangle-exclamation', accent: 'var(--amber)', foot: s.lowCount ? 'Produtos a repor' : 'Stock controlado' }
+  ]);
+}
+
+function renderSettings() {
+  const s = state.settings;
+  $('#settings-admin-name').value = s.adminName;
+  $('#settings-admin-role').value = s.adminRole;
+  $('#settings-store-name').value = s.storeName;
+  $('#settings-store-location').value = s.storeLocation;
+  $('#settings-payment').value = PAYMENT_METHODS[s.defaultPayment] ? s.defaultPayment : 'card';
+}
+
+function saveSettingsForm(event) {
+  event.preventDefault();
+  const values = {
+    adminName: $('#settings-admin-name').value.trim(),
+    adminRole: $('#settings-admin-role').value.trim(),
+    storeName: $('#settings-store-name').value.trim(),
+    storeLocation: $('#settings-store-location').value.trim(),
+    defaultPayment: $('#settings-payment').value
+  };
+  if (!values.adminName || !values.adminRole || !values.storeName || !values.storeLocation) {
+    toast('Preencha todos os campos das definições.', 'error', 'Dados incompletos');
+    return;
+  }
+  Object.assign(state.settings, values);
+  saveSettings();
+  updateBranding();
+  toast('Definições guardadas com sucesso.', 'success', 'Dados atualizados');
+}
+
+/* ------------------------------------------------------------
+   10. DASHBOARD
+   ------------------------------------------------------------ */
+function renderDashboard() {
+  const s = getStats();
+  const vatRateLabel = 'IVA (' + VAT_RATE + '%)';
+
+  renderStats($('#dashboard-stats'), [
+    { label: 'Total de produtos', value: s.totalProducts, format: fmtNum, icon: 'fa-solid fa-boxes-stacking', accent: 'var(--brand)', foot: fmtNum(s.totalStock) + ' unidades em stock' },
+    { label: 'Stock total', value: s.totalStock, format: fmtNum, icon: 'fa-solid fa-cubes', accent: 'var(--violet)', foot: 'Valor: ' + fmtMoney(s.stockValue) },
+    { label: 'Número de vendas', value: s.salesCount, format: fmtNum, icon: 'fa-solid fa-receipt', accent: 'var(--cyan)', foot: 'Ticket médio: ' + fmtMoney(s.avgTicket) },
+    { label: 'Faturação total', value: s.revenue, format: fmtMoney, icon: 'fa-solid fa-euro-sign', accent: 'var(--green)', foot: 'Base: ' + fmtMoney(s.netTotal) },
+    { label: vatRateLabel + ' liquidado', value: s.vatTotal, format: fmtMoney, icon: 'fa-solid fa-file-invoice', accent: 'var(--amber)', foot: 'Taxa normal (Portugal)' },
+    { label: 'Produtos com stock baixo', value: s.lowCount, format: fmtNum, icon: 'fa-solid fa-triangle-exclamation', accent: s.lowCount ? 'var(--red)' : 'var(--green)', foot: 'Stock igual ou inferior a ' + LOW_STOCK + ' unidades' }
+  ]);
+
+  // Últimas vendas
+  const latest = state.sales.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6);
+  const tbody = $('#dashboard-sales-body');
+  if (!latest.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-inline">Ainda não existem vendas registadas.</div></td></tr>';
+  } else {
+    tbody.innerHTML = latest.map((sale) =>
+      '<tr>' +
+        '<td class="mono">#' + String(sale.id).padStart(4, '0') + '</td>' +
+        '<td><strong>' + esc(sale.productName) + '</strong><br><span class="mono">' + esc(sale.productRef || '') + '</span></td>' +
+        '<td class="num">' + fmtNum(sale.qty) + '</td>' +
+        '<td class="num">' + fmtMoney(sale.subtotal) + '</td>' +
+        '<td class="num">' + fmtMoney(sale.vat) + '</td>' +
+        '<td class="num"><strong>' + fmtMoney(sale.total) + '</strong></td>' +
+        '<td>' + fmtDate(sale.date) + '</td>' +
+      '</tr>').join('');
+  }
+
+  // Stock baixo
+  renderLowStockList($('#dashboard-low-stock'), $('#low-stock-count'), s.lowProducts);
+  updateSidebarHealth(s);
+
+  // Gráficos
+  registerChart('chart-fat', (holder) => {
+    drawBarChart(holder, lastDaysSeries(7, true));
+  });
+  registerChart('chart-stock', (holder) => {
+    const crit = state.products.filter((p) => p.stock <= LOW_STOCK).length;
+    const warn = state.products.filter((p) => p.stock > LOW_STOCK && p.stock <= MEDIUM_STOCK).length;
+    const ok = state.products.filter((p) => p.stock > MEDIUM_STOCK).length;
+    drawDoughnut(holder, [
+      { label: 'Normal', value: ok, color: cssVar('--green') },
+      { label: 'Reduzido', value: warn, color: cssVar('--amber') },
+      { label: 'Crítico', value: crit, color: cssVar('--red') }
+    ], 'produtos');
+  });
+  registerChart('chart-products', (holder) => {
+    const data = state.products.slice()
+      .sort((a, b) => b.stock - a.stock)
+      .slice(0, 10)
+      .map((p) => ({ label: p.name, value: p.stock, color: cssVar('--brand') }));
+    drawHBarChart(holder, data, { money: false });
+  });
+}
+
+function renderLowStockList(listEl, countEl, lowProducts) {
+  if (countEl) countEl.textContent = lowProducts.length;
+  if (!listEl) return;
+
+  if (!lowProducts.length) {
+    listEl.innerHTML =
+      '<li class="empty-inline" style="display:block;border-style:dashed">' +
+      '<i class="fa-solid fa-circle-check" style="color:var(--green)"></i><br>' +
+      'Sem alertas: todos os produtos têm mais de ' + LOW_STOCK + ' unidades.</li>';
+
+    return;
+  }
+
+  listEl.innerHTML = lowProducts
+    .sort((a, b) => a.stock - b.stock)
+    .map((p) => {
+      const st = stockStatus(p.stock);
+      return '<li>' +
+        '<span><span class="ls-name">' + esc(p.name) + '</span>' +
+        '<span class="ls-ref">' + esc(p.ref) + ' · ' + fmtMoney(p.price) + '</span></span>' +
+        '<span class="ls-qty" style="color:var(--' + (st.cls === 'crit' ? 'red' : st.cls === 'warn' ? 'amber' : 'green') + ')">' +
+        fmtNum(p.stock) + ' un.</span>' +
+        '</li>';
+    }).join('');
+}
+
+function updateSidebarHealth(s) {
+  const el = $('#sidebar-low-stock');
+  if (el) el.textContent = s.lowCount;
+  const bar = $('#sidebar-health-bar');
+  if (bar) {
+    const total = Math.max(s.totalProducts, 1);
+    bar.style.width = Math.min((s.lowCount / total) * 100 * 3, 100) + '%';
+  }
+}
+
+/* ------------------------------------------------------------
+   11. INVENTÁRIO
+   ------------------------------------------------------------ */
+function getFilteredProducts() {
+  const f = state.filters.inventory;
+  let list = state.products.slice();
+
+  if (f.search.trim()) {
+    const q = f.search.trim().toLowerCase();
+    list = list.filter((p) => p.name.toLowerCase().includes(q) || p.ref.toLowerCase().includes(q));
+  }
+
+  if (f.stock === 'low')    list = list.filter((p) => p.stock <= LOW_STOCK);
+  if (f.stock === 'medium') list = list.filter((p) => p.stock > LOW_STOCK && p.stock <= MEDIUM_STOCK);
+  if (f.stock === 'ok')     list = list.filter((p) => p.stock > MEDIUM_STOCK);
+
+  if (f.price === 'p1') list = list.filter((p) => p.price <= 25);
+  if (f.price === 'p2') list = list.filter((p) => p.price > 25 && p.price <= 100);
+  if (f.price === 'p3') list = list.filter((p) => p.price > 100 && p.price <= 500);
+  if (f.price === 'p4') list = list.filter((p) => p.price > 500);
+
+  const sorters = {
+    'name-asc':  (a, b) => a.name.localeCompare(b.name, 'pt'),
+    'name-desc': (a, b) => b.name.localeCompare(a.name, 'pt'),
+    'price-asc': (a, b) => a.price - b.price,
+    'price-desc': (a, b) => b.price - a.price,
+    'stock-asc': (a, b) => a.stock - b.stock,
+    'stock-desc': (a, b) => b.stock - a.stock
+  };
+  return list.sort(sorters[f.sort] || sorters['name-asc']);
+}
+
+function renderInventory() {
+  const list = getFilteredProducts();
+  const tbody = $('#inventory-body');
+  const empty = $('#inv-empty');
+
+  $('#inv-info').textContent =
+    list.length + ' de ' + state.products.length + ' produtos · ' +
+    fmtNum(sum(list, (p) => p.stock)) + ' unidades · valor ' + fmtMoney(sum(list, (p) => p.price * p.stock));
+
+  if (!list.length) {
+    tbody.innerHTML = '';
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+
+  tbody.innerHTML = list.map((p) => {
+    const st = stockStatus(p.stock);
+    return '<tr>' +
+      '<td class="mono">' + esc(p.ref) + '</td>' +
+      '<td><strong>' + esc(p.name) + '</strong></td>' +
+      '<td class="num">' + fmtMoney(p.price) + '</td>' +
+      '<td class="num"><strong>' + fmtNum(p.stock) + '</strong></td>' +
+      '<td><span class="badge ' + st.cls + '">' +
+        '<i class="fa-solid fa-circle" style="font-size:.5rem"></i> ' + st.label + '</span></td>' +
+      '<td class="col-actions"><div class="row-actions">' +
+        '<button class="mini-btn edit" data-action="edit" data-id="' + p.id + '" title="Editar produto"><i class="fa-solid fa-pen"></i></button>' +
+        '<button class="mini-btn restock" data-action="restock" data-id="' + p.id + '" title="Repor stock"><i class="fa-solid fa-plus"></i></button>' +
+        '<button class="mini-btn delete" data-action="delete" data-id="' + p.id + '" title="Eliminar produto"><i class="fa-solid fa-trash"></i></button>' +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+}
+
+/* --- Modal de produto (adicionar / editar) --- */
+function openProductModal(product) {
+  const editing = Boolean(product);
+  $('#product-modal-title').textContent = editing ? 'Editar produto' : 'Adicionar produto';
+  $('#product-id').value = editing ? product.id : '';
+  $('#product-ref').value = editing ? product.ref : nextRef();
+  $('#product-ref').readOnly = true;
+  $('#product-name').value = editing ? product.name : '';
+  $('#product-price').value = editing ? product.price : '';
+  $('#product-stock').value = editing ? product.stock : '';
+  $('#product-min-stock').value = editing ? (product.minStock ?? 3) : 3;
+  $('#product-category').value = editing ? (product.category || '') : '';
+  renderSupplierOptions(editing ? (product.supplierId || '') : '');
+  hideAlert($('#product-alert'));
+  openModal('product-modal');
+  setTimeout(() => $('#product-name').focus(), 60);
+}
+
+function nextRef() {
+  const nums = state.products
+    .map((p) => (p.ref.match(/(\d+)$/) ? parseInt(p.ref.match(/(\d+)$/)[1], 10) : 0))
+    .filter((n) => n > 0);
+  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  return 'ART' + String(next).padStart(3, '0');
+}
+
+function submitProductForm(event) {
+  event.preventDefault();
+  const alertEl = $('#product-alert');
+  const id = $('#product-id').value;
+  const ref = id ? $('#product-ref').value.trim().toUpperCase() : nextRef();
+  const name = $('#product-name').value.trim();
+  const price = parseFloat($('#product-price').value);
+  const stock = parseInt($('#product-stock').value, 10);
+  const minStock = parseInt($('#product-min-stock').value, 10);
+  const category = $('#product-category').value.trim();
+  const supplierId = $('#product-supplier').value;
+
+  if (!ref || !name) { showAlert(alertEl, 'Preencha a referência e o nome do produto.'); return; }
+  if (isNaN(price) || price < 0) { showAlert(alertEl, 'Indique um preço válido (maior ou igual a 0).'); return; }
+  if (isNaN(stock) || stock < 0) { showAlert(alertEl, 'Indique um stock válido (maior ou igual a 0).'); return; }
+  if (isNaN(minStock) || minStock < 0) { showAlert(alertEl, 'Indique um stock mínimo válido.'); return; }
+
+  const duplicated = state.products.some((p) => p.ref === ref && p.id !== id);
+  if (duplicated) { showAlert(alertEl, 'Já existe um produto com a referência ' + ref + '.'); return; }
+
+  if (id) {
+    const product = state.products.find((p) => p.id === id);
+    if (!product) { showAlert(alertEl, 'Produto não encontrado.'); return; }
+    Object.assign(product, { ref, name, price: round2(price), stock, minStock, category, supplierId, updatedAt: Date.now() });
+    toast(name + ' atualizado com sucesso.', 'success', 'Produto guardado');
+  } else {
+    state.products.push({
+      id: uid(), ref, name, price: round2(price), stock, minStock, category, supplierId,
+      createdAt: Date.now(), updatedAt: Date.now()
+    });
+    toast(name + ' adicionado ao inventário.', 'success', 'Produto criado');
+  }
+
+  saveProducts();
+  closeModal('product-modal');
+  renderInventory();
+  refreshAfterDataChange();
+}
+
+/* --- Repor stock --- */
+let restockProductId = null;
+function openRestockModal(product) {
+  restockProductId = product.id;
+  $('#restock-product-label').innerHTML =
+    '<strong>' + esc(product.name) + '</strong> (' + esc(product.ref) + ') · stock atual: ' + fmtNum(product.stock) + ' un.';
+  $('#restock-qty').value = 10;
+  hideAlert($('#restock-alert'));
+  openModal('restock-modal');
+  setTimeout(() => $('#restock-qty').select(), 60);
+}
+
+function submitRestockForm(event) {
+  event.preventDefault();
+  const alertEl = $('#restock-alert');
+  const qty = parseInt($('#restock-qty').value, 10);
+  const product = state.products.find((p) => p.id === restockProductId);
+
+  if (!product) { showAlert(alertEl, 'Produto não encontrado.'); return; }
+  if (isNaN(qty) || qty <= 0) { showAlert(alertEl, 'A quantidade a adicionar tem de ser maior que zero.'); return; }
+
+  product.stock += qty;
+  product.updatedAt = Date.now();
+  state.movements.unshift({ id: uid(), productId: product.id, productName: product.name, productRef: product.ref, type: 'Entrada', qty, date: new Date().toISOString(), note: 'Reposição de stock' });
+  saveProducts();
+  saveMovements();
+  closeModal('restock-modal');
+  toast('+' + fmtNum(qty) + ' un. em ' + product.name + ' (stock: ' + fmtNum(product.stock) + ').', 'success', 'Stock reposto');
+  renderInventory();
+  refreshAfterDataChange();
+}
+
+/* --- Eliminar produto --- */
+function confirmDeleteProduct(product) {
+  askConfirm(
+    'Eliminar o produto "' + product.name + '" (' + product.ref + ')? As vendas já registadas no histórico são mantidas.',
+    () => {
+      state.products = state.products.filter((p) => p.id !== product.id);
+      saveProducts();
+      toast(product.name + ' removido do inventário.', 'info', 'Produto eliminado');
+      renderInventory();
+      refreshAfterDataChange();
+    },
+    'Eliminar'
+  );
+}
+
+/* ------------------------------------------------------------
+   12. REGISTAR VENDA (POS)
+   ------------------------------------------------------------ */
+function renderPOS() {
+  const select = $('#sale-product');
+  const current = select.value;
+  const options = ['<option value="">— Selecione um produto —</option>'].concat(
+    state.products
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name, 'pt'))
+      .map((p) => '<option value="' + p.id + '">' + esc(p.ref) + ' · ' + esc(p.name) +
+        ' (' + fmtNum(p.stock) + ' un.)</option>')
+  );
+  select.innerHTML = options.join('');
+  if (current && state.products.some((p) => p.id === current)) select.value = current;
+  const payment = $('#sale-payment');
+  if (payment) payment.value = PAYMENT_METHODS[state.settings.defaultPayment] ? state.settings.defaultPayment : 'card';
+  updateSalePreview();
+}
+
+function selectedSaleProduct() {
+  return state.products.find((p) => p.id === $('#sale-product').value) || null;
+}
+
+function updateSalePreview() {
+  const product = selectedSaleProduct();
+  const qtyInput = $('#sale-qty');
+  let qty = parseInt(qtyInput.value, 10);
+  if (isNaN(qty) || qty < 1) qty = 1;
+
+  const stockChip = $('#sale-stock-chip');
+  const priceChip = $('#sale-price-chip');
+  const hint = $('#sale-product-hint');
+
+  if (!product) {
+    stockChip.className = 'stock-chip';
+    stockChip.innerHTML = '<i class="fa-solid fa-warehouse"></i> Stock: —';
+    priceChip.innerHTML = '<i class="fa-solid fa-tag"></i> Preço: —';
+    hint.textContent = 'Selecione um produto para ver o stock disponível.';
+    $('#sum-product').textContent = '—';
+    $('#sum-ref').textContent = '—';
+    $('#sum-qty').textContent = '0';
+    $('#sum-price').textContent = '—';
+    $('#sum-payment').textContent = paymentLabel($('#sale-payment').value);
+    $('#sum-client').textContent = 'Consumidor final';
+    $('#sum-discount').textContent = fmtMoney(0);
+    $('#sum-subtotal').textContent = fmtMoney(0);
+    $('#sum-iva').textContent = fmtMoney(0);
+    $('#sum-total').textContent = fmtMoney(0);
+    $('#sale-lines').innerHTML = '';
+    return;
+  }
+
+  const st = stockStatus(product.stock);
+  stockChip.className = 'stock-chip' + (product.stock <= LOW_STOCK ? ' low' : '');
+  stockChip.innerHTML = '<i class="fa-solid fa-warehouse"></i> Stock disponível: ' + fmtNum(product.stock) + ' un.';
+  priceChip.innerHTML = '<i class="fa-solid fa-tag"></i> Preço: ' + fmtMoney(product.price) + ' / un.';
+  hint.textContent = 'Estado do stock: ' + st.label + ' · IVA aplicado: ' + VAT_RATE + '%.';
+
+  const discount = Math.max(0, parseFloat($('#sale-discount').value) || 0);
+  const base = computeSale(product.price, qty);
+  const subtotal = Math.max(0, round2(base.subtotal - discount));
+  const vat = round2(subtotal * (VAT_RATE / 100));
+  const total = round2(subtotal + vat);
+  const client = state.clients.find(c => c.id === $('#sale-client').value);
+
+  $('#sum-product').textContent = product.name;
+  $('#sum-ref').textContent = product.ref;
+  $('#sum-qty').textContent = fmtNum(qty);
+  $('#sum-price').textContent = fmtMoney(product.price);
+  $('#sum-payment').textContent = paymentLabel($('#sale-payment').value);
+  $('#sum-client').textContent = client ? client.name : 'Consumidor final';
+  $('#sum-discount').textContent = fmtMoney(discount);
+  $('#sum-subtotal').textContent = fmtMoney(subtotal);
+  $('#sum-iva').textContent = fmtMoney(vat);
+  $('#sum-total').textContent = fmtMoney(total);
+
+  $('#sale-lines').innerHTML =
+    '<div class="line"><span>Preço</span><strong>' + fmtMoney(product.price) + '</strong></div>' +
+    '<div class="line"><span>Quantidade</span><strong>' + fmtNum(qty) + '</strong></div>' +
+    '<div class="line"><span>Subtotal</span><strong>' + fmtMoney(subtotal) + '</strong></div>' +
+    '<div class="line"><span>Desconto</span><strong>' + fmtMoney(discount) + '</strong></div>' +
+    '<div class="line"><span>IVA (' + VAT_RATE + '%)</span><strong>' + fmtMoney(vat) + '</strong></div>' +
+    '<div class="line"><span>Total</span><strong style="color:var(--brand)">' + fmtMoney(total) + '</strong></div>';
+}
+
+function finalizeSale(event) {
+  event.preventDefault();
+  const alertEl = $('#sale-alert');
+  const product = selectedSaleProduct();
+  const qty = parseInt($('#sale-qty').value, 10);
+  const paymentMethod = $('#sale-payment').value;
+
+  // validações
+  if (!product) { showAlert(alertEl, 'Selecione um produto antes de finalizar a venda.'); toast('Nenhum produto selecionado.', 'error', 'Venda não registada'); return; }
+  if (isNaN(qty) || qty <= 0) { showAlert(alertEl, 'A quantidade tem de ser um número inteiro maior que zero.'); toast('Quantidade inválida.', 'error', 'Venda não registada'); return; }
+  if (qty > product.stock) {
+    showAlert(alertEl, 'Stock insuficiente: apenas ' + fmtNum(product.stock) + ' un. de ' + product.name + ' em stock (pedido: ' + fmtNum(qty) + ').');
+    toast('Stock insuficiente para ' + product.name + '.', 'error', 'Venda não registada');
+    return;
+  }
+
+  const discount = Math.max(0, parseFloat($('#sale-discount').value) || 0);
+  const clientId = $('#sale-client').value || '';
+  const client = state.clients.find((c) => c.id === clientId);
+  const base = computeSale(product.price, qty);
+  const subtotalAfterDiscount = Math.max(0, round2(base.subtotal - discount));
+  const vat = round2(subtotalAfterDiscount * (VAT_RATE / 100));
+  const total = round2(subtotalAfterDiscount + vat);
+  state.settings.counter = (state.settings.counter || 0) + 1;
+  const sale = {
+    id: state.settings.counter, saleNumber: 'VND' + String(state.settings.counter).padStart(4, '0'),
+    productId: product.id, productName: product.name, productRef: product.ref, unitPrice: product.price, qty,
+    subtotal: subtotalAfterDiscount, discount, vat, total, vatRate: VAT_RATE, paymentMethod,
+    clientId, clientName: client ? client.name : 'Consumidor final', clientNif: client ? client.nif : '',
+    employee: state.settings.adminName, status: 'Concluída', date: new Date().toISOString()
+  };
+
+  // atualizar stock e histórico
+  product.stock -= qty;
+  product.updatedAt = Date.now();
+  state.sales.push(sale);
+  state.movements.unshift({ id: uid(), productId: product.id, productName: product.name, productRef: product.ref, type: 'Saída', qty, date: sale.date, note: 'Venda ' + sale.saleNumber });
+
+  saveProducts();
+  saveSales();
+  saveMovements();
+  saveSettings();
+
+  hideAlert(alertEl);
+  toast('#' + String(sale.id).padStart(4, '0') + ' · ' + product.name + ' ×' + qty + ' = ' + fmtMoney(sale.total) + '. Stock atual: ' + fmtNum(product.stock) + ' un.', 'success', 'Venda registada');
+  clearSaleForm();
+  renderPOS();
+  refreshAfterDataChange();
+}
+
+function clearSaleForm() {
+  const qty = $('#sale-qty');
+  if (qty) qty.value = 1;
+  const payment = $('#sale-payment');
+  if (payment) payment.value = state.settings.defaultPayment || 'card';
+  if ($('#sale-client')) $('#sale-client').value = '';
+  if ($('#sale-discount')) $('#sale-discount').value = 0;
+  hideAlert($('#sale-alert'));
+  updateSalePreview();
+}
+
+/* ------------------------------------------------------------
+   12B. CLIENTES, FORNECEDORES E MOVIMENTOS
+   ------------------------------------------------------------ */
+function renderSupplierOptions(selected = '') {
+  const el = $('#product-supplier');
+  if (!el) return;
+  el.innerHTML = '<option value="">Sem fornecedor</option>' + state.suppliers.map(s => '<option value="'+esc(s.id)+'">'+esc(s.name)+'</option>').join('');
+  el.value = selected || '';
+}
+function renderClientOptions(selected = '') {
+  const el = $('#sale-client');
+  if (!el) return;
+  el.innerHTML = '<option value="">Consumidor final</option>' + state.clients.map(c => '<option value="'+esc(c.id)+'">'+esc(c.name)+(c.nif ? ' — '+esc(c.nif) : '')+'</option>').join('');
+  el.value = selected || '';
+}
+function renderClients() {
+  const q = ($('#client-search')?.value || '').toLowerCase();
+  const rows = state.clients.filter(c => [c.name,c.nif,c.phone,c.email].join(' ').toLowerCase().includes(q));
+  $('#clients-body').innerHTML = rows.map(c => '<tr><td><strong>'+esc(c.name)+'</strong></td><td>'+esc(c.nif||'—')+'</td><td>'+esc(c.phone||'—')+'</td><td>'+esc(c.email||'—')+'</td><td>'+esc(c.address||'—')+'</td><td class="col-actions"><div class="row-actions"><button class="mini-btn edit" data-action="edit-client" data-id="'+c.id+'"><i class="fa-solid fa-pen"></i></button><button class="mini-btn delete" data-action="delete-client" data-id="'+c.id+'"><i class="fa-solid fa-trash"></i></button></div></td></tr>').join('') || '<tr><td colspan="6" class="muted">Ainda não existem clientes registados.</td></tr>';
+}
+function renderSuppliers() {
+  const q = ($('#supplier-search')?.value || '').toLowerCase();
+  const rows = state.suppliers.filter(s => [s.name,s.nif,s.phone,s.email].join(' ').toLowerCase().includes(q));
+  $('#suppliers-body').innerHTML = rows.map(s => '<tr><td><strong>'+esc(s.name)+'</strong></td><td>'+esc(s.nif||'—')+'</td><td>'+esc(s.phone||'—')+'</td><td>'+esc(s.email||'—')+'</td><td>'+esc(s.address||'—')+'</td><td class="col-actions"><div class="row-actions"><button class="mini-btn edit" data-action="edit-supplier" data-id="'+s.id+'"><i class="fa-solid fa-pen"></i></button><button class="mini-btn delete" data-action="delete-supplier" data-id="'+s.id+'"><i class="fa-solid fa-trash"></i></button></div></td></tr>').join('') || '<tr><td colspan="6" class="muted">Ainda não existem fornecedores registados.</td></tr>';
+}
+function renderMovements() {
+  const rows = state.movements.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  $('#movements-body').innerHTML = rows.map(m => '<tr><td>'+fmtDate(m.date)+'</td><td>'+esc(m.productName)+'</td><td>'+esc(m.productRef)+'</td><td><span class="pill '+(m.type==='Entrada'?'pill-ok':'pill-warn')+'">'+esc(m.type)+'</span></td><td class="num">'+(m.type==='Entrada'?'+':'-')+fmtNum(m.qty)+'</td><td>'+esc(m.note||'')+'</td></tr>').join('') || '<tr><td colspan="6" class="muted">Ainda não existem movimentos registados.</td></tr>';
+}
+function openClientModal(client=null) {
+  $('#client-id').value=client?client.id:''; $('#client-name').value=client?client.name:''; $('#client-nif').value=client?client.nif||'':''; $('#client-phone').value=client?client.phone||'':''; $('#client-email').value=client?client.email||'':''; $('#client-address').value=client?client.address||'':''; $('#client-modal-title').textContent=client?'Editar cliente':'Novo cliente'; hideAlert($('#client-alert')); openModal('client-modal');
+}
+function openSupplierModal(supplier=null) {
+  $('#supplier-id').value=supplier?supplier.id:''; $('#supplier-name').value=supplier?supplier.name:''; $('#supplier-nif').value=supplier?supplier.nif||'':''; $('#supplier-phone').value=supplier?supplier.phone||'':''; $('#supplier-email').value=supplier?supplier.email||'':''; $('#supplier-address').value=supplier?supplier.address||'':''; $('#supplier-modal-title').textContent=supplier?'Editar fornecedor':'Novo fornecedor'; hideAlert($('#supplier-alert')); openModal('supplier-modal');
+}
+function isValidEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);}
+function keepDigitsOnly(input){if(!input)return;input.addEventListener('input',()=>{const cleaned=input.value.replace(/\D/g,'').slice(0,9);if(input.value!==cleaned)input.value=cleaned;});}
+['#client-nif','#client-phone','#supplier-nif','#supplier-phone'].forEach(selector=>keepDigitsOnly($(selector)));
+function saveClientForm(e){e.preventDefault();const id=$('#client-id').value;const c={id:id||uid(),name:$('#client-name').value.trim(),nif:$('#client-nif').value.trim(),phone:$('#client-phone').value.trim(),email:$('#client-email').value.trim(),address:$('#client-address').value.trim()};if(!c.name){showAlert($('#client-alert'),'O nome do cliente é obrigatório.');return;}if(!c.email){showAlert($('#client-alert'),'O email do cliente é obrigatório.');return;}if(!isValidEmail(c.email)){showAlert($('#client-alert'),'Introduza um email válido.');return;}if(!/^\d{9}$/.test(c.phone)){showAlert($('#client-alert'),'O telefone é obrigatório e deve conter exatamente 9 dígitos, sem letras ou espaços.');return;}if(c.nif&&!/^\d{9}$/.test(c.nif)){showAlert($('#client-alert'),'O NIF, se preenchido, deve conter exatamente 9 dígitos, sem letras ou espaços.');return;}if(id){Object.assign(state.clients.find(x=>x.id===id),c)}else state.clients.push(c);saveClients();closeModal('client-modal');renderClients();renderClientOptions();toast('Cliente guardado com sucesso.','success','Clientes');}
+function saveSupplierForm(e){e.preventDefault();const id=$('#supplier-id').value;const s={id:id||uid(),name:$('#supplier-name').value.trim(),nif:$('#supplier-nif').value.trim(),phone:$('#supplier-phone').value.trim(),email:$('#supplier-email').value.trim(),address:$('#supplier-address').value.trim()};if(!s.name){showAlert($('#supplier-alert'),'O nome da empresa é obrigatório.');return;}if(!s.email){showAlert($('#supplier-alert'),'O email do fornecedor é obrigatório.');return;}if(!isValidEmail(s.email)){showAlert($('#supplier-alert'),'Introduza um email válido.');return;}if(!/^\d{9}$/.test(s.phone)){showAlert($('#supplier-alert'),'O telefone é obrigatório e deve conter exatamente 9 dígitos, sem letras ou espaços.');return;}if(!/^\d{9}$/.test(s.nif)){showAlert($('#supplier-alert'),'O NIF é obrigatório e deve conter exatamente 9 dígitos, sem letras ou espaços.');return;}if(id){Object.assign(state.suppliers.find(x=>x.id===id),s)}else state.suppliers.push(s);saveSuppliers();closeModal('supplier-modal');renderSuppliers();renderSupplierOptions();toast('Fornecedor guardado com sucesso.','success','Fornecedores');}
+function printSale(sale){const w=window.open('','_blank','width=760,height=700');if(!w){toast('Permita janelas pop-up para imprimir o recibo.','error');return;}w.document.write('<!doctype html><html lang="pt-PT"><head><meta charset="utf-8"><title>'+esc(sale.saleNumber||('VND'+sale.id))+'</title><style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;padding:20px;color:#111}h1{margin-bottom:4px}table{width:100%;border-collapse:collapse;margin-top:25px}th,td{padding:9px;border-bottom:1px solid #ddd;text-align:left}.total{text-align:right;font-size:22px;font-weight:bold;margin-top:20px}.muted{color:#666}</style></head><body><h1>GereStock</h1><p class="muted">Recibo de venda</p><p><strong>N.º:</strong> '+esc(sale.saleNumber||('VND'+String(sale.id).padStart(4,'0')))+'<br><strong>Data:</strong> '+fmtDate(sale.date)+'<br><strong>Funcionário:</strong> '+esc(sale.employee||state.settings.adminName)+'<br><strong>Cliente:</strong> '+esc(sale.clientName||'Consumidor final')+(sale.clientNif?' — NIF '+esc(sale.clientNif):'')+'</p><table><tr><th>Produto</th><th>Qtd.</th><th>Preço</th><th>Total</th></tr><tr><td>'+esc(sale.productName)+'<br><small>'+esc(sale.productRef)+'</small></td><td>'+fmtNum(sale.qty)+'</td><td>'+fmtMoney(sale.unitPrice)+'</td><td>'+fmtMoney(sale.subtotal)+'</td></tr></table><p>Desconto: '+fmtMoney(sale.discount||0)+'<br>IVA ('+sale.vatRate+'%): '+fmtMoney(sale.vat)+'</p><div class="total">Total: '+fmtMoney(sale.total)+'</div><p class="muted">Pagamento: '+paymentLabel(sale.paymentMethod)+' · Estado: '+esc(sale.status||'Concluída')+'</p><script>window.onload=()=>window.print();<\/script></body></html>');w.document.close();}
+
+/* ------------------------------------------------------------
+   13. HISTÓRICO DE VENDAS
+   ------------------------------------------------------------ */
+function getFilteredSales() {
+  const f = state.filters.history;
+  let list = state.sales.slice();
+
+  if (f.search.trim()) {
+    const q = f.search.trim().toLowerCase();
+    list = list.filter((s) =>
+      s.productName.toLowerCase().includes(q) ||
+      String(s.productRef || '').toLowerCase().includes(q) ||
+      String(s.id).includes(q));
+  }
+  if (f.product !== 'all') list = list.filter((s) => s.productRef === f.product);
+  if (f.date) {
+    list = list.filter((s) => new Date(s.date).toISOString().slice(0, 10) === f.date);
+  }
+
+  const sorters = {
+    recent:      (a, b) => new Date(b.date) - new Date(a.date),
+    old:         (a, b) => new Date(a.date) - new Date(b.date),
+    'total-desc': (a, b) => b.total - a.total,
+    'total-asc':  (a, b) => a.total - b.total
+  };
+  return list.sort(sorters[f.sort] || sorters.recent);
+}
+
+function renderHistory() {
+  const filtered = getFilteredSales();
+  const f = state.filters.history;
+
+  renderStats($('#history-stats'), [
+    { label: 'Total faturado', value: round2(sum(filtered, (s) => s.total)), format: fmtMoney, icon: 'fa-solid fa-euro-sign', accent: 'var(--green)', foot: 'Faturação (IVA incluído)' },
+    { label: 'Total de IVA', value: round2(sum(filtered, (s) => s.vat)), format: fmtMoney, icon: 'fa-solid fa-file-invoice', accent: 'var(--amber)', foot: 'IVA liquidado a ' + VAT_RATE + '%' },
+    { label: 'Número de vendas', value: filtered.length, format: fmtNum, icon: 'fa-solid fa-receipt', accent: 'var(--brand)', foot: filtered.length !== state.sales.length ? 'Vendas filtradas de ' + state.sales.length : 'Todas as vendas registadas' }
+  ]);
+
+  // filtro por produto
+  const productSelect = $('#hist-product');
+  const currentProduct = productSelect.value || f.product;
+  productSelect.innerHTML = '<option value="all">Todos os produtos</option>' +
+    state.products.slice().sort((a, b) => a.name.localeCompare(b.name, 'pt'))
+      .map((p) => '<option value="' + esc(p.ref) + '">' + esc(p.ref) + ' · ' + esc(p.name) + '</option>').join('');
+  productSelect.value = currentProduct && Array.from(productSelect.options).some((o) => o.value === currentProduct)
+    ? currentProduct : f.product;
+
+  const pages = Math.max(Math.ceil(filtered.length / PAGE_SIZE), 1);
+  if (f.page > pages) f.page = pages;
+  const start = (f.page - 1) * PAGE_SIZE;
+  const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+  $('#hist-info').textContent = filtered.length + ' venda(s) encontrada(s) · a mostrar ' +
+    (filtered.length ? (start + 1) + '–' + (start + pageItems.length) : '0') + ' de ' + filtered.length;
+
+  const tbody = $('#history-body');
+  if (!pageItems.length) {
+    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-inline">Nenhuma venda corresponde aos filtros selecionados.</div></td></tr>';
+  } else {
+    tbody.innerHTML = pageItems.map((s) =>
+      '<tr>' +
+        '<td class="mono">#' + String(s.id).padStart(4, '0') + '</td>' +
+        '<td><strong>' + esc(s.productName) + '</strong></td>' +
+        '<td class="mono">' + esc(s.productRef || '') + '</td>' +
+        '<td class="num">' + fmtNum(s.qty) + '</td>' +
+        '<td class="num">' + fmtMoney(s.subtotal) + '</td>' +
+        '<td class="num">' + fmtMoney(s.vat) + '</td>' +
+        '<td class="num"><strong>' + fmtMoney(s.total) + '</strong></td>' +
+        '<td>' + esc(paymentLabel(s.paymentMethod)) + '</td>' +
+        '<td>' + fmtDate(s.date) + '</td>' +
+        '<td class="col-actions"><div class="row-actions">' +
+          '<button class="mini-btn" data-action="print-sale" title="Imprimir recibo"><i class="fa-solid fa-print"></i></button><button class="mini-btn delete" data-action="delete-sale" data-id="' + s.id + '" title="Anular venda e repor stock"><i class="fa-solid fa-rotate-left"></i></button>' +
+        '</div></td>' +
+      '</tr>').join('');
+  }
+
+  // paginação
+  const pag = $('#hist-pagination');
+  pag.innerHTML = '';
+  if (filtered.length > PAGE_SIZE) {
+    const addBtn = (label, page, disabled, active) => {
+      const b = document.createElement('button');
+      b.textContent = label;
+      if (active) b.classList.add('active');
+      b.disabled = Boolean(disabled);
+      b.addEventListener('click', () => { f.page = page; renderHistory(); });
+      pag.appendChild(b);
+    };
+    addBtn('‹', Math.max(f.page - 1, 1), f.page === 1, false);
+    for (let i = 1; i <= pages; i++) {
+      if (pages > 7 && i !== 1 && i !== pages && Math.abs(i - f.page) > 1) {
+        if (i === 2 || i === pages - 1) {
+          const span = document.createElement('button');
+          span.textContent = '…';
+          span.disabled = true;
+          pag.appendChild(span);
+        }
+        continue;
+      }
+      addBtn(String(i), i, false, i === f.page);
+    }
+    addBtn('›', Math.min(f.page + 1, pages), f.page === pages, false);
+  }
+}
+
+function confirmCancelSale(sale) {
+  askConfirm(
+    'Anular a venda #' + String(sale.id).padStart(4, '0') + ' (' + sale.productName + ' ×' + sale.qty +
+    ' — ' + fmtMoney(sale.total) + ')? O stock será reposto em ' + sale.qty + ' unidade(s).',
+    () => {
+      const product = state.products.find((p) => p.id === sale.productId);
+      if (product) {
+        product.stock += sale.qty;
+        product.updatedAt = Date.now();
+        saveProducts();
+        state.movements.unshift({ id: uid(), productId: product.id, productName: product.name, productRef: product.ref, type: 'Entrada', qty: sale.qty, date: new Date().toISOString(), note: 'Anulação ' + (sale.saleNumber || ('VND' + String(sale.id).padStart(4, '0'))) });
+        saveMovements();
+      }
+      state.sales = state.sales.filter((s) => s.id !== sale.id);
+      saveSales();
+      toast('Venda #' + String(sale.id).padStart(4, '0') + ' anulada.' + (product ? ' Stock de ' + product.name + ': ' + fmtNum(product.stock) + ' un.' : ''), 'info', 'Venda anulada');
+      renderHistory();
+      refreshAfterDataChange();
+    },
+    'Anular venda'
+  );
+}
+
+/* ------------------------------------------------------------
+   14. RELATÓRIOS
+   ------------------------------------------------------------ */
+function renderReports() {
+  const s = getStats();
+
+  renderStats($('#report-stats'), [
+    { label: 'Faturação total', value: s.revenue, format: fmtMoney, icon: 'fa-solid fa-euro-sign', accent: 'var(--green)', foot: 'Com IVA incluído' },
+    { label: 'IVA total', value: s.vatTotal, format: fmtMoney, icon: 'fa-solid fa-file-invoice', accent: 'var(--amber)', foot: 'Taxa de ' + VAT_RATE + '%' },
+    { label: 'Número de vendas', value: s.salesCount, format: fmtNum, icon: 'fa-solid fa-receipt', accent: 'var(--brand)', foot: 'Ticket médio ' + fmtMoney(s.avgTicket) },
+    {
+      label: 'Produto mais vendido', display: s.bestSeller ? s.bestSeller.name : '—',
+      icon: 'fa-solid fa-ranking-star', accent: 'var(--violet)',
+      foot: s.bestSeller ? fmtNum(s.bestSeller.qty) + ' unidades vendidas' : 'Sem vendas registadas'
+    },
+    {
+      label: 'Maior faturação', display: s.topRevenue ? s.topRevenue.name : '—',
+      icon: 'fa-solid fa-trophy', accent: 'var(--cyan)',
+      foot: s.topRevenue ? fmtMoney(s.topRevenue.revenue) + ' faturados' : 'Sem vendas registadas'
+    },
+    { label: 'Stock total', value: s.totalStock, format: fmtNum, icon: 'fa-solid fa-cubes', accent: 'var(--brand)', foot: 'Valor de inventário ' + fmtMoney(s.stockValue) },
+    { label: 'Produtos com stock baixo', value: s.lowCount, format: fmtNum, icon: 'fa-solid fa-triangle-exclamation', accent: s.lowCount ? 'var(--red)' : 'var(--green)', foot: 'Limite: ≤ ' + LOW_STOCK + ' unidades' },
+    { label: 'Produtos no catálogo', value: s.totalProducts, format: fmtNum, icon: 'fa-solid fa-boxes-stacking', accent: 'var(--violet)', foot: 'Valor médio ' + fmtMoney(s.totalProducts ? s.stockValue / s.totalProducts : 0) + ' / produto' }
+  ]);
+
+  // tabela de stock baixo
+  const lowBody = $('#report-low-stock');
+  if (!s.lowProducts.length) {
+    lowBody.innerHTML = '<tr><td colspan="5"><div class="empty-inline">Nenhum produto com stock igual ou inferior a ' + LOW_STOCK + ' unidades.</div></td></tr>';
+  } else {
+    lowBody.innerHTML = s.lowProducts.slice().sort((a, b) => a.stock - b.stock).map((p) =>
+      '<tr>' +
+        '<td class="mono">' + esc(p.ref) + '</td>' +
+        '<td><strong>' + esc(p.name) + '</strong></td>' +
+        '<td class="num"><span class="badge ' + stockStatus(p.stock).cls + '">' + fmtNum(p.stock) + '</span></td>' +
+        '<td class="num">' + fmtMoney(p.price) + '</td>' +
+        '<td class="num">' + fmtMoney(round2(p.price * p.stock)) + '</td>' +
+      '</tr>').join('');
+  }
+
+  registerChart('chart-sales-by-product', (holder) => {
+    const data = s.productSales.slice().sort((a, b) => b.qty - a.qty).slice(0, 8)
+      .map((p) => ({ label: p.name, value: p.qty, color: cssVar('--brand') }));
+    drawHBarChart(holder, data, { money: false });
+  });
+
+  registerChart('chart-revenue-by-product', (holder) => {
+    const data = s.productSales.slice().sort((a, b) => b.revenue - a.revenue).slice(0, 8)
+      .map((p) => ({ label: p.name, value: p.revenue, color: cssVar('--green') }));
+    drawHBarChart(holder, data);
+  });
+
+  registerChart('chart-evolution', (holder) => {
+    drawLineChart(holder, lastDaysSeries(14, true));
+  });
+
+  registerChart('chart-stock-report', (holder) => {
+    const data = state.products.slice().sort((a, b) => b.stock - a.stock).slice(0, 6)
+      .map((p, i) => ({ label: p.name, value: p.stock, color: palette()[i % palette().length] }));
+    drawDoughnut(holder, data, 'unidades');
+  });
+}
+
+/* ------------------------------------------------------------
+   15. EXPORTAÇÃO EXCEL
+   ------------------------------------------------------------ */
+function downloadExcel(filename, rows, sheetName) {
+  if (typeof XLSX === 'undefined') {
+    toast('Não foi possível carregar a biblioteca de exportação.', 'error', 'Exportação cancelada');
+    return;
+  }
+  const worksheet = XLSX.utils.aoa_to_sheet(rows);
+  worksheet['!cols'] = rows[0].map(() => ({ wch: 18 }));
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  XLSX.writeFile(workbook, filename);
+}
+
+function exportSalesExcel() {
+  const list = getFilteredSales();
+  if (!list.length) { toast('Não existem vendas para exportar com os filtros atuais.', 'error', 'Exportação cancelada'); return; }
+
+  const rows = [['ID', 'Produto', 'Referência', 'Quantidade', 'Preço unitário (EUR)', 'Subtotal (EUR)', 'IVA (EUR)', 'Taxa IVA (%)', 'Total (EUR)', 'Pagamento', 'Data']];
+  list.forEach((s) => rows.push([
+    String(s.id).padStart(4, '0'), s.productName, s.productRef || '', s.qty,
+    s.unitPrice.toFixed(2).replace('.', ','),
+    s.subtotal.toFixed(2).replace('.', ','),
+    s.vat.toFixed(2).replace('.', ','),
+    String(s.vatRate || VAT_RATE),
+    s.total.toFixed(2).replace('.', ','),
+    paymentLabel(s.paymentMethod),
+    fmtDate(s.date)
+  ]));
+  rows.push([]);
+  rows.push(['Total faturado (EUR)', round2(sum(list, (s) => s.total)).toFixed(2).replace('.', ',')]);
+  rows.push(['Total de IVA (EUR)', round2(sum(list, (s) => s.vat)).toFixed(2).replace('.', ',')]);
+  rows.push(['Número de vendas', list.length]);
+
+  downloadExcel('gerestock-vendas-' + new Date().toISOString().slice(0, 10) + '.xlsx', rows, 'Vendas');
+  toast(list.length + ' venda(s) exportada(s) para Excel.', 'success', 'Exportação concluída');
+}
+
+function exportReportExcel() {
+  const s = getStats();
+  const rows = [];
+
+  rows.push(['GereStock — Relatório de gestão']);
+  rows.push(['Gerado em', fmtDate(new Date().toISOString())]);
+  rows.push([]);
+  rows.push(['INDICADORES']);
+  rows.push(['Faturação total (EUR)', s.revenue.toFixed(2).replace('.', ',')]);
+  rows.push(['IVA total (EUR)', s.vatTotal.toFixed(2).replace('.', ',')]);
+  rows.push(['Base tributável (EUR)', s.netTotal.toFixed(2).replace('.', ',')]);
+  rows.push(['Número de vendas', s.salesCount]);
+  rows.push(['Ticket médio (EUR)', s.avgTicket.toFixed(2).replace('.', ',')]);
+  rows.push(['Total de produtos', s.totalProducts]);
+  rows.push(['Stock total (unidades)', s.totalStock]);
+  rows.push(['Valor do inventário (EUR)', s.stockValue.toFixed(2).replace('.', ',')]);
+  rows.push(['Produtos com stock baixo', s.lowCount]);
+  rows.push(['Produto mais vendido', s.bestSeller ? s.bestSeller.name + ' (' + s.bestSeller.qty + ' un.)' : '—']);
+  rows.push(['Produto com maior faturação', s.topRevenue ? s.topRevenue.name + ' (' + s.topRevenue.revenue.toFixed(2).replace('.', ',') + ' EUR)' : '—']);
+  rows.push([]);
+
+  rows.push(['VENDAS POR PRODUTO']);
+  rows.push(['Referência', 'Produto', 'Unidades vendidas', 'Faturação (EUR)', 'IVA (EUR)']);
+  s.productSales.slice().sort((a, b) => b.revenue - a.revenue).forEach((p) => rows.push([
+    p.ref || '', p.name, p.qty,
+    p.revenue.toFixed(2).replace('.', ','),
+    p.vat.toFixed(2).replace('.', ',')
+  ]));
+  rows.push([]);
+
+  rows.push(['INVENTÁRIO']);
+  rows.push(['Referência', 'Produto', 'Preço (EUR)', 'Stock', 'Estado', 'Valor em stock (EUR)']);
+  state.products.slice().sort((a, b) => a.ref.localeCompare(b.ref)).forEach((p) => rows.push([
+    p.ref, p.name,
+    p.price.toFixed(2).replace('.', ','),
+    p.stock,
+    stockStatus(p.stock).label,
+    round2(p.price * p.stock).toFixed(2).replace('.', ',')
+  ]));
+  rows.push([]);
+
+  rows.push(['HISTÓRICO DE VENDAS']);
+  rows.push(['ID', 'Produto', 'Referência', 'Quantidade', 'Subtotal (EUR)', 'IVA (EUR)', 'Total (EUR)', 'Pagamento', 'Data']);
+  state.sales.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).forEach((sale) => rows.push([
+    String(sale.id).padStart(4, '0'), sale.productName, sale.productRef || '', sale.qty,
+    sale.subtotal.toFixed(2).replace('.', ','),
+    sale.vat.toFixed(2).replace('.', ','),
+    sale.total.toFixed(2).replace('.', ','),
+    paymentLabel(sale.paymentMethod),
+    fmtDate(sale.date)
+  ]));
+
+  downloadExcel('gerestock-relatorio-' + new Date().toISOString().slice(0, 10) + '.xlsx', rows, 'Relatório');
+  toast('Relatório completo exportado para Excel.', 'success', 'Exportação concluída');
+}
+
+/* ------------------------------------------------------------
+   16. TEMA (claro / escuro)
+   ------------------------------------------------------------ */
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  state.settings.theme = theme;
+  saveSettings();
+  const icon = $('#theme-toggle i');
+  if (icon) icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+  requestAnimationFrame(renderAllCharts);
+}
+
+/* ------------------------------------------------------------
+   17. FAQ (acordeões)
+   ------------------------------------------------------------ */
+function initFAQ() {
+  $$('.faq-question').forEach((button) => {
+    button.addEventListener('click', () => {
+      const item = button.closest('.faq-item');
+      const answer = item.querySelector('.faq-answer');
+      const isOpen = item.classList.contains('open');
+
+      // fechar os outros (comportamento de acordeão)
+      $$('.faq-item.open').forEach((other) => {
+        if (other !== item) {
+          other.classList.remove('open');
+          other.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+          other.querySelector('.faq-answer').style.maxHeight = '0px';
+        }
+      });
+
+      if (isOpen) {
+        item.classList.remove('open');
+        button.setAttribute('aria-expanded', 'false');
+        answer.style.maxHeight = '0px';
+      } else {
+        item.classList.add('open');
+        button.setAttribute('aria-expanded', 'true');
+        answer.style.maxHeight = answer.scrollHeight + 40 + 'px';
+      }
+    });
+  });
+}
+
+/* ------------------------------------------------------------
+   18. SIDEBAR MOBILE
+   ------------------------------------------------------------ */
+function openSidebar() {
+  $('#sidebar').classList.add('open');
+  $('#sidebar-overlay').classList.add('show');
+  $('#menu-toggle').setAttribute('aria-expanded', 'true');
+}
+function closeSidebar() {
+  $('#sidebar').classList.remove('open');
+  $('#sidebar-overlay').classList.remove('show');
+  $('#menu-toggle').setAttribute('aria-expanded', 'false');
+}
+
+/* ------------------------------------------------------------
+   19. ATUALIZAÇÃO GLOBAL APÓS ALTERAÇÃO DE DADOS
+   ------------------------------------------------------------ */
+function refreshAfterDataChange() {
+  updateSidebarHealth(getStats());
+  renderCharts(PAGES[currentPage()].chartIds);
+}
+
+function currentPage() {
+  const hash = location.hash.replace('#', '');
+  return PAGES[hash] ? hash : 'inicio';
+}
+
+/* ------------------------------------------------------------
+   20. EVENTOS E ARRANQUE
+   ------------------------------------------------------------ */
+function bindEvents() {
+  // navegação
+  $$('.nav-item').forEach((item) => {
+    item.addEventListener('click', (event) => {
+      event.preventDefault();
+      navigate(item.dataset.page);
+    });
+  });
+  $$('[data-page]').forEach((el) => {
+    if (el.classList.contains('nav-item')) return;
+    el.addEventListener('click', (event) => { event.preventDefault(); navigate(el.dataset.page); });
+  });
+  window.addEventListener('hashchange', () => navigate(currentPage(), false));
+
+  // sidebar mobile
+  $('#menu-toggle').addEventListener('click', () => {
+    $('#sidebar').classList.contains('open') ? closeSidebar() : openSidebar();
+  });
+  $('#sidebar-overlay').addEventListener('click', closeSidebar);
+
+  // tema
+  $('#theme-toggle').addEventListener('click', () => {
+    applyTheme(state.settings.theme === 'dark' ? 'light' : 'dark');
+  });
+  $('#admin-settings').addEventListener('click', () => navigate('definicoes'));
+  $('#settings-theme-toggle').addEventListener('click', () => {
+    applyTheme(state.settings.theme === 'dark' ? 'light' : 'dark');
+  });
+  $('#settings-form').addEventListener('submit', saveSettingsForm);
+
+  // --- inventário: filtros ---
+  $('#inv-search').addEventListener('input', debounce((e) => { state.filters.inventory.search = e.target.value; renderInventory(); }, 180));
+  $('#inv-filter-stock').addEventListener('change', (e) => { state.filters.inventory.stock = e.target.value; renderInventory(); });
+  $('#inv-filter-price').addEventListener('change', (e) => { state.filters.inventory.price = e.target.value; renderInventory(); });
+  $('#inv-sort').addEventListener('change', (e) => { state.filters.inventory.sort = e.target.value; renderInventory(); });
+  $('#inv-reset').addEventListener('click', () => {
+    state.filters.inventory = { search: '', stock: 'all', price: 'all', sort: 'name-asc' };
+    $('#inv-search').value = '';
+    $('#inv-filter-stock').value = 'all';
+    $('#inv-filter-price').value = 'all';
+    $('#inv-sort').value = 'name-asc';
+    renderInventory();
+    toast('Filtros do inventário reiniciados.', 'info');
+  });
+
+  $('#btn-add-product').addEventListener('click', () => openProductModal(null));
+  $('#product-form').addEventListener('submit', submitProductForm);
+  $('#product-modal-close').addEventListener('click', () => closeModal('product-modal'));
+  $('#product-cancel').addEventListener('click', () => closeModal('product-modal'));
+  $('#restock-form').addEventListener('submit', submitRestockForm);
+  $('#restock-close').addEventListener('click', () => closeModal('restock-modal'));
+  $('#restock-cancel').addEventListener('click', () => closeModal('restock-modal'));
+
+  // ações em tabela (delegação de eventos)
+  document.addEventListener('click', (event) => {
+    const btn = event.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const id = btn.dataset.id;
+
+    if (action === 'edit') {
+      const product = state.products.find((p) => p.id === id);
+      if (product) openProductModal(product);
+    }
+    if (action === 'restock') {
+      const product = state.products.find((p) => p.id === id);
+      if (product) openRestockModal(product);
+    }
+    if (action === 'delete') {
+      const product = state.products.find((p) => p.id === id);
+      if (product) confirmDeleteProduct(product);
+    }
+    if (action === 'print-sale') { const sale=state.sales.find(s=>String(s.id)===String(id)); if(sale) printSale(sale); }
+    if (action === 'delete-sale') {
+      const sale = state.sales.find((s) => String(s.id) === String(id));
+      if (sale) confirmCancelSale(sale);
+    }
+    if (action === 'edit-client') { const c=state.clients.find(x=>x.id===id); if(c) openClientModal(c); }
+    if (action === 'delete-client') { state.clients=state.clients.filter(x=>x.id!==id); saveClients(); renderClients(); renderClientOptions(); toast('Cliente eliminado.','info'); }
+    if (action === 'edit-supplier') { const s=state.suppliers.find(x=>x.id===id); if(s) openSupplierModal(s); }
+    if (action === 'delete-supplier') { state.suppliers=state.suppliers.filter(x=>x.id!==id); saveSuppliers(); renderSuppliers(); renderSupplierOptions(); toast('Fornecedor eliminado.','info'); }
+  });
+
+  // confirmação
+  $('#confirm-ok').addEventListener('click', () => {
+    const cb = confirmCallback;
+    confirmCallback = null;
+    closeModal('confirm-modal');
+    if (typeof cb === 'function') cb();
+  });
+  $('#confirm-cancel').addEventListener('click', () => { confirmCallback = null; closeModal('confirm-modal'); });
+  $('#confirm-close').addEventListener('click', () => { confirmCallback = null; closeModal('confirm-modal'); });
+
+  // fechar modais com ESC / clique no fundo
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      ['product-modal', 'restock-modal', 'confirm-modal', 'client-modal', 'supplier-modal'].forEach((id) => {
+        if (!document.getElementById(id).hidden) closeModal(id);
+      });
+    }
+  });
+  $$('.modal-overlay').forEach((overlay) => {
+    overlay.addEventListener('mousedown', (event) => {
+      if (event.target === overlay) {
+        confirmCallback = null;
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+    });
+  });
+
+  // --- clientes / fornecedores / movimentos ---
+  $('#btn-add-client').addEventListener('click', () => openClientModal());
+  $('#client-form').addEventListener('submit', saveClientForm);
+  $('#client-modal-close').addEventListener('click', () => closeModal('client-modal'));
+  $('#client-cancel').addEventListener('click', () => closeModal('client-modal'));
+  $('#client-search').addEventListener('input', debounce(renderClients, 150));
+  $('#btn-add-supplier').addEventListener('click', () => openSupplierModal());
+  $('#supplier-form').addEventListener('submit', saveSupplierForm);
+  $('#supplier-modal-close').addEventListener('click', () => closeModal('supplier-modal'));
+  $('#supplier-cancel').addEventListener('click', () => closeModal('supplier-modal'));
+  $('#supplier-search').addEventListener('input', debounce(renderSuppliers, 150));
+
+  // --- POS ---
+  $('#sale-product').addEventListener('change', updateSalePreview);
+  $('#sale-qty').addEventListener('input', updateSalePreview);
+  $('#sale-payment').addEventListener('change', updateSalePreview);
+  $('#sale-client').addEventListener('change', updateSalePreview);
+  $('#sale-discount').addEventListener('input', updateSalePreview);
+  renderClientOptions();
+  renderSupplierOptions();
+  renderClients();
+  renderSuppliers();
+  renderMovements();
+  $('#qty-plus').addEventListener('click', () => {
+    const input = $('#sale-qty');
+    input.value = (parseInt(input.value, 10) || 0) + 1;
+    updateSalePreview();
+  });
+  $('#qty-minus').addEventListener('click', () => {
+    const input = $('#sale-qty');
+    input.value = Math.max((parseInt(input.value, 10) || 1) - 1, 1);
+    updateSalePreview();
+  });
+  $('#sale-form').addEventListener('submit', finalizeSale);
+  $('#btn-clear-sale').addEventListener('click', () => {
+    $('#sale-product').value = '';
+    clearSaleForm();
+    toast('Formulário de venda limpo.', 'info');
+  });
+
+  // --- histórico: filtros ---
+  $('#hist-search').addEventListener('input', debounce((e) => { state.filters.history.search = e.target.value; state.filters.history.page = 1; renderHistory(); }, 180));
+  $('#hist-product').addEventListener('change', (e) => { state.filters.history.product = e.target.value; state.filters.history.page = 1; renderHistory(); });
+  $('#hist-date').addEventListener('change', (e) => { state.filters.history.date = e.target.value; state.filters.history.page = 1; renderHistory(); });
+  $('#hist-sort').addEventListener('change', (e) => { state.filters.history.sort = e.target.value; renderHistory(); });
+  $('#hist-reset').addEventListener('click', () => {
+    state.filters.history = { search: '', product: 'all', date: '', sort: 'recent', page: 1 };
+    $('#hist-search').value = '';
+    $('#hist-product').value = 'all';
+    $('#hist-date').value = '';
+    $('#hist-sort').value = 'recent';
+    renderHistory();
+    toast('Filtros do histórico reiniciados.', 'info');
+  });
+  $('#btn-export-sales').addEventListener('click', exportSalesExcel);
+  $('#btn-export-report').addEventListener('click', exportReportExcel);
+
+  // re-render dos gráficos em redimensionamento / mudança de orientação
+  window.addEventListener('resize', debounce(() => { renderAllCharts(); }, 200));
+  if (typeof ResizeObserver !== 'undefined') {
+    const observer = new ResizeObserver(debounce(() => {
+      renderAllCharts();
+      const open = $('.faq-item.open .faq-answer');
+      if (open) open.style.maxHeight = open.scrollHeight + 40 + 'px';
+    }, 200));
+    $$('.chart-holder').forEach((h) => observer.observe(h));
+  }
+}
+
+function init() {
+  loadData();
+
+  // tema inicial
+  applyTheme(state.settings.theme === 'dark' ? 'dark' : 'light');
+  updateBranding();
+
+  // data de hoje na topbar
+  const today = new Date().toLocaleDateString('pt-PT', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  $('#today-date').textContent = today.charAt(0).toUpperCase() + today.slice(1);
+  $('#footer-year').textContent = new Date().getFullYear();
+
+  bindEvents();
+  initFAQ();
+  navigate(currentPage(), false);
+
+  if (!localStorage.getItem('gerestock_welcome_shown')) {
+    localStorage.setItem('gerestock_welcome_shown', '1');
+    setTimeout(() => toast('Dados iniciais carregados: ' + state.products.length + ' produtos no inventário.', 'info', 'Bem-vindo ao GereStock'), 700);
+  }
+}
+
+
+// Início de sessão e registo de demonstração. Não substitui autenticação segura no servidor.
+(function(){
+  const form = document.getElementById('login-form');
+  if (!form) return;
+  const screen = document.getElementById('login-screen');
+  const userInput = document.getElementById('login-user');
+  const passInput = document.getElementById('login-password');
+  const error = document.getElementById('login-error');
+  const status = document.getElementById('login-status');
+  const toggle = document.getElementById('login-toggle-register');
+  const submit = document.getElementById('login-submit');
+  const registerFields = document.getElementById('login-register-fields');
+  const confirmInput = document.getElementById('register-confirm');
+  let registerMode = false;
+  if (sessionStorage.getItem('gerestock_session') === 'active') screen.style.display = 'none';
+  toggle.addEventListener('click', function(){
+    registerMode = !registerMode;
+    registerFields.hidden = !registerMode;
+    confirmInput.required = registerMode;
+    submit.textContent = registerMode ? 'Criar conta' : 'Entrar no GereStock';
+    toggle.textContent = registerMode ? 'Já tens conta? Iniciar sessão' : 'Ainda não tens conta? Criar registo';
+    error.textContent = '';
+    status.textContent = '';
+    status.classList.remove('error');
+  });
+  form.addEventListener('submit', function(event){
+    event.preventDefault();
+    const user = userInput.value.trim();
+    const pass = passInput.value;
+    error.textContent = '';
+    status.textContent = '';
+    status.classList.remove('error');
+    if (registerMode) {
+      if (user.length < 3) { error.textContent = 'O utilizador deve ter pelo menos 3 caracteres.'; return; }
+      if (pass.length < 6) { error.textContent = 'A palavra-passe deve ter pelo menos 6 caracteres.'; return; }
+      if (pass !== confirmInput.value) { error.textContent = 'As palavras-passe não coincidem.'; return; }
+      if (user.toLowerCase() === 'admin') { error.textContent = 'Este nome de utilizador já está reservado.'; return; }
+      let users = [];
+      try { users = JSON.parse(localStorage.getItem('gerestock_demo_users') || '[]'); } catch(e) { users = []; }
+      if (users.some(item => item.username.toLowerCase() === user.toLowerCase())) { error.textContent = 'Este utilizador já existe. Escolhe outro.'; return; }
+      users.push({ username: user, password: pass });
+      localStorage.setItem('gerestock_demo_users', JSON.stringify(users));
+      registerMode = false;
+      registerFields.hidden = true;
+      confirmInput.required = false;
+      submit.textContent = 'Entrar no GereStock';
+      toggle.textContent = 'Ainda não tens conta? Criar registo';
+      passInput.value = '';
+      confirmInput.value = '';
+      status.textContent = 'Registo criado! Já podes iniciar sessão.';
+      userInput.focus();
+      return;
+    }
+    let users = [];
+    try { users = JSON.parse(localStorage.getItem('gerestock_demo_users') || '[]'); } catch(e) { users = []; }
+    const isAdmin = user === 'admin' && pass === 'GereStock123!';
+    const registeredUser = users.some(item => item.username.toLowerCase() === user.toLowerCase() && item.password === pass);
+    if (isAdmin || registeredUser) {
+      sessionStorage.setItem('gerestock_session','active');
+      screen.style.display = 'none';
+    } else {
+      error.textContent = 'Utilizador ou palavra-passe incorretos. Tente novamente.';
+    }
+  });
+})();
+
+document.addEventListener('DOMContentLoaded', init);
+
+</script>
+</body>
+</html>
